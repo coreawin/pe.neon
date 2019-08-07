@@ -1,0 +1,1 @@
+select * from SCOPUS_2014_DOCUMENT;
