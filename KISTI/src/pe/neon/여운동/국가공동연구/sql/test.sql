@@ -1,1 +1,8 @@
-select * from SCOPUS_2014_DOCUMENT;
+--select * from SCOPUS_2017Y_CT_KEYWORD_BASE ;
+
+
+
+--select * from NYEO2019_SCOPUS_UNIQ_CT_EID;
+
+
+select * from NYEO2019_SCOPUS_AKEY_CN_BASE;
