@@ -5,11 +5,10 @@
 
 /*최근 5년간(2014-2018) 논문(article, proceeding, review)에서 발생하는 키워드들을 20개 과학기술분류의 하위분류(4자리코드)에 대해서 찾는다.*/
 -- @coreawin 201908 작업 : 최근 5년간 논문 데이터 구축 ar, cp, re 2014-2018
+--12,776,499건
 
 DROP TABLE SCOPUS_2017_DOCUMENT CASCADE CONSTRAINTS PURGE; --과거 테이블  삭제
-
 DROP TABLE NYEO2019_SCOPUS_DOCUMENT CASCADE CONSTRAINTS PURGE;
-
 CREATE TABLE NYEO2019_SCOPUS_DOCUMENT nologging AS
     SELECT /*+ PARALLEL (4) */ EID, PUBLICATION_YEAR, TITLE, CITATION_TYPE, SOURCE_ID, DOI, CIT_COUNT, REF_COUNT
     FROM SCOPUS_2014_DOCUMENT
@@ -41,7 +40,7 @@ create index IDX_SCOPUS_2016_AFFIL_AFID on NYEO2019_SCOPUS_AFFIL_FULL(AFID) nolo
 create index IDX_SCOPUS_2016_AFFIL_CT on NYEO2019_SCOPUS_AFFIL_FULL(COUNTRY_CODE) nologging;
 
 /*
-    @coreawin 201908 작업 : 최근 10년간의 논문 ID, 논문의 연도, 대분류, 국가 정보 수집 쿼리
+    @coreawin 201908 작업 : 최근 5년간의 논문 ID, 논문의 연도, 대분류, 국가 정보 수집 쿼리
     - 국가코드는 중복을 포함하여 수집
 	- 논문의 Fractional Count 방식의 피인용수와 논문건수를 계산할떄 실제 논문의 국가의 총건수, 논문의 국가별 건수 수집을 위해 사용.
 */
