@@ -216,12 +216,25 @@ create INDEX IDXNYEO_KEYCNFC_KEY ON NYEO2019_FILTER_KEY_CN_FC(keyword) NOLOGGING
 SELECT * FROM NYEO2019_FILTER_KEY_CN_FC
 ORDER BY keyword, country_code
 ;
+
+/**
+@coreawin 20190823 키워드별 전체 fractional count 논문/피인용수
+pbykey, cbykey
+*/
 --마-2.3 키워드별 fractional count 논문수 와 인용수
-SELECT keyword, ROUND(SUM(PbyKeybyCo), 4) AS pbykey, ROUND(SUM(CbyKeybyCo),4), SUM(PbyKeybyCo) AS pbykey, SUM(CbyKeybyCo) AS cbykey
-FROM NYEO2019_FILTER_KEY_CN_FC
-GROUP BY keyword
-ORDER BY keyword
+drop table NYEO2019_FILTER_KEY_CN_AFC cascade constraints purge;
+create TABLE NYEO2019_FILTER_KEY_CN_AFC NOLOGGING AS
+    SELECT keyword, ROUND(SUM(PbyKeybyCo), 4) AS pbykey, ROUND(SUM(CbyKeybyCo),4) as cbykey, SUM(PbyKeybyCo) AS pbykey, SUM(CbyKeybyCo) AS cbykey
+    FROM NYEO2019_FILTER_KEY_CN_FC
+    GROUP BY keyword
+    ORDER BY keyword
 ;
+
+COMMENT ON TABLE NYEO2019_FILTER_KEY_CN_AFC IS '@coreawin 20190823 키워드별 전체 fractional count 논문/피인용수 pbykey, cbykey';
+COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_AFC.keyword IS '키워드';
+COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_AFC.pbykey IS '키워드별 국가 논문 Fractional Count';
+COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_AFC.cbykey IS '키워드별 국가 인용 Fractional Count';
+create INDEX IDXNYEO_KEYCNAFC_KEY ON NYEO2019_FILTER_KEY_CN_AFC(keyword) NOLOGGING parallel 2;
 
 
 /**
@@ -259,8 +272,40 @@ COMMENT ON TABLE NYEO2019_FILTER_KEY_CN_SLOPE IS '@coreawin 20190823 키워드�
 COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_SLOPE.keyword IS '키워드';
 COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_SLOPE.country_code IS '국가';
 COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_SLOPE.slope IS '성장기울기';
-COMMENT ON COLUMN NYEO2019_FILTER_KEY_CN_SLOPE.CbyKeybyCo IS '키워드별 국가 인용 Fractional Count';
+
 create INDEX IDXNYEO_KEYCNSLOPE_KEY ON NYEO2019_FILTER_KEY_CN_SLOPE(keyword) NOLOGGING parallel 2;
+create INDEX IDXNYEO_KEYCNSLOPE_CN ON NYEO2019_FILTER_KEY_CN_SLOPE(COUNTRY_CODE) NOLOGGING parallel 2;
+
+/**
+@coreawin 190823  국가별 키워드 별 활동도 및 영향력
+*/
+--사- 2.1 키워드별 국가별 활동도 및 영향력
+drop table NYEO2019_RE_ACT_INF cascade constraints purge;
+create TABLE NYEO2019_RE_ACT_INF NOLOGGING AS
+    SELECT
+    country_code,
+    keyword,
+     DECODE(pbykey, 0, 0, ROUND(((pbykeybyco/pbykey) / (pbyco/3567982)), 4)) AS act,
+    DECODE(cbykey,0, 0, ROUND(((cbykeybyco/cbykey) / (cbyco/24954870)), 4)) AS inf,
+    slope
+    FROM (
+        SELECT slope.keyword, slope.COUNTRY_CODE, pbykeybyco, cbykeybyco,
+       (SELECT pbyco FROM NYEO2019_RE_PBYCO_COUNTRY_F WHERE country_code = slope.country_code) AS pbyco,
+       (SELECT cbyco FROM NYEO2019_RE_PBYCO_COUNTRY_F WHERE country_code = slope.country_code) AS cbyco,
+       (SELECT pbykey FROM NYEO2019_FILTER_KEY_CN_AFC WHERE keyword = slope.keyword) AS pbykey,
+       (SELECT cbykey FROM NYEO2019_FILTER_KEY_CN_AFC WHERE keyword = slope.keyword) AS cbykey,
+       slope
+        FROM NYEO2019_FILTER_KEY_CN_SLOPE slope, NYEO2019_FILTER_KEY_CN_FC fc
+        WHERE slope.KEYWORD = fc.keyword AND slope.COUNTRY_CODE = fc.country_code
+    ) R
+    order by country_code, keyword
+ ;
+
+COMMENT ON TABLE NYEO2019_RE_ACT_INF IS '@coreawin 20190823 국가별 키워드 별 활동도 및 영향력';
+COMMENT ON COLUMN NYEO2019_RE_ACT_INF.keyword IS '키워드';
+COMMENT ON COLUMN NYEO2019_RE_ACT_INF.country_code IS '국가';
+create INDEX IDXNYEO_REACTINF_KEY ON NYEO2019_RE_ACT_INF(keyword) NOLOGGING parallel 2;
+create INDEX IDXNYEO_REACTINF_CN ON NYEO2019_RE_ACT_INF(COUNTRY_CODE) NOLOGGING parallel 2;
 
 
 
@@ -280,54 +325,3 @@ create INDEX IDXNYEO_KEYCNSLOPE_KEY ON NYEO2019_FILTER_KEY_CN_SLOPE(keyword) NOL
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- 38,821,625 (전체),  12,670,754(Filter)
-select count(*) from NYEO2019_SCOPUS_UNIQ_CT_EID where eid in (select distinct eid from NYEO2019_SCOPUS_FILTERING_DOC)
-
-drop table SCOPUS_2017_AFF_CT_STAT_KOR cascade constraints purge;
-drop table NYEO2019_SCOPUS_CT_STAT_ALL cascade constraints purge;
-create TABLE NYEO2019_SCOPUS_CT_STAT_ALL as
-select  /*+ PARALLEL (4) */  distinct
-	U.EID,
-	U.PUBLICATION_YEAR,
-    U.L_ASJC_CODE as ASJC_CODE,
-    U.COUNTRY_CODE,
-    (1 * (F_CT_CNT.COUNTRY_CNT / F_CT_CNT.COUNRY_TOTAL_CNT)) as DOC_CNT,
-    (U.CIT_COUNT * (F_CT_CNT.COUNTRY_CNT / F_CT_CNT.COUNRY_TOTAL_CNT)) as CIT_CNT
-from NYEO2019_SCOPUS_UNIQ_CT_EID U
-inner join (
-    select STATS.EID, STATS.PUBLICATION_YEAR, STATS.L_ASJC_CODE as ASJC_CODE, STATS.COUNTRY_CODE, STATS.COUNRY_TOTAL_CNT, count (STATS.COUNTRY_CODE) as COUNTRY_CNT
-    from (
-        select COUNTRY_STATS.EID, COUNTRY_STATS.PUBLICATION_YEAR, COUNTRY_STATS.L_ASJC_CODE, COUNTRY_STATS.COUNTRY_CODE, S_STATS.CT_CNT as COUNRY_TOTAL_CNT
-        from  NYEO2019_SCOPUS_AFF_CT_EID COUNTRY_STATS
-        inner join (
-			select SK.EID, SK.PUBLICATION_YEAR, SK.L_ASJC_CODE as ASJC_CODE, count(SK.COUNTRY_CODE) as CT_CNT
-            from NYEO2019_SCOPUS_AFF_CT_EID SK
-            group by SK.EID, SK.PUBLICATION_YEAR, SK.L_ASJC_CODE
-        ) S_STATS
-        on 	S_STATS.EID = COUNTRY_STATS.EID
-        and S_STATS.PUBLICATION_YEAR = COUNTRY_STATS.PUBLICATION_YEAR
-        and S_STATS.ASJC_CODE = COUNTRY_STATS.L_ASJC_CODE
-    ) STATS
-    group by STATS.EID, STATS.PUBLICATION_YEAR, STATS.L_ASJC_CODE, STATS.COUNTRY_CODE, STATS.COUNRY_TOTAL_CNT
-) F_CT_CNT
-on U.EID = F_CT_CNT.EID
-and U.PUBLICATION_YEAR = F_CT_CNT.PUBLICATION_YEAR
-and U.L_ASJC_CODE = F_CT_CNT.ASJC_CODE
-and U.COUNTRY_CODE = F_CT_CNT.COUNTRY_CODE
---WHERE U.COUNTRY_CODE = 'KOR';
