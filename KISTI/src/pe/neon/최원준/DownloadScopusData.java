@@ -1,9 +1,10 @@
-package pe.kisti;
+package pe.neon.최원준;
 
 import kr.co.tqk.web.db.dao.export.ExportField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,22 +77,15 @@ public class DownloadScopusData {
     }
 
     public static void main(String... args) throws Exception {
-        String searchRule = "AU=(\"Pollard, Jeffrey W.\")";
-        if (args != null) {
-            try {
-                downloadPath = args[0];
-                logger.info("download path : {} ", downloadPath);
-            } catch (Exception e) {
-            }
-            try {
-                modelpath = args[1];
-            } catch (Exception e) {
-            }
-        }
-        // searchRule = "PY=(1999-2013)";
-        for (int idx = 2013; idx <= 2013; idx++) {
-            searchRule = "PY=(%s)".format("PY=(%s)", idx);
+        String searchRule = null;
+        for (int idx = 1997; idx <= 2019; idx++) {
+            downloadPath = String.format("d:/data/이창환/20190819/최원준/SCOPUS_KOR_DOCUMENT_%s.tsv", idx);
+            new File(downloadPath).getParentFile().mkdirs();
+            searchRule = String.format("PY=(%s) CU=(KOR)", idx);
             logger.debug("searchRule {}", searchRule);
+            logger.debug("download path {}", downloadPath);
+            System.out.println(searchRule);
+            System.out.println(downloadPath);
             new DownloadScopusData(searchRule);
         }
     }

@@ -876,13 +876,13 @@ public class ExtractKCountData {
                     //System.out.println("\t" + country +"\t" + dkbc.toString());
                     switch (type) {
                         case CBYKEY:
-                            buf.append(dkbc.cbykeybyco);
+                            buf.append(dkbc.cbykeybyco==null?"0":dkbc.cbykeybyco);
                             break;
                         case PBYKEY:
-                            buf.append(dkbc.pbykeybyco);
+                            buf.append(dkbc.pbykeybyco==null?"0":dkbc.pbykeybyco);
                             break;
                         case SLOPE:
-                            buf.append(dkbc.slope);
+                            buf.append(dkbc.slope==null?"0":dkbc.slope);
                             break;
                     }
                 }
