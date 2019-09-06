@@ -279,7 +279,7 @@ create INDEX IDXNYEO_KEYCNSLOPE_CN ON NYEO2019_FILTER_KEY_CN_SLOPE(COUNTRY_CODE)
 /**
 @coreawin 190823  국가별 키워드 별 활동도 및 영향력
 */
---사- 2.1 키워드별 국가별 활동도 및 영향력
+--사- 2.1 키워드별 국가별 활동도 및 영향력 (
 drop table NYEO2019_RE_ACT_INF cascade constraints purge;
 create TABLE NYEO2019_RE_ACT_INF NOLOGGING AS
     SELECT
@@ -309,6 +309,34 @@ create INDEX IDXNYEO_REACTINF_CN ON NYEO2019_RE_ACT_INF(COUNTRY_CODE) NOLOGGING 
 
 
 
+--사- 2.2 키워드별 국가별 활동도 및 영향력 (전체)
+-- @coreawin 190906  국가별 키워드 별 활동도 및 영향력
+drop table NYEO2019_RE_ACT_IN cascade constraints purge;
+create TABLE NYEO2019_RE_ACT_IN NOLOGGING AS
+    SELECT
+    country_code,
+    keyword,
+     DECODE(pbykey, 0, 0, ROUND(((pbykeybyco/pbykey) / (pbyco/12776499)), 4)) AS act,
+    DECODE(cbykey,0, 0, ROUND(((cbykeybyco/cbykey) / (cbyco/69442227)), 4)) AS inf,
+    slope
+    FROM (
+        SELECT slope.keyword, slope.COUNTRY_CODE, pbykeybyco, cbykeybyco,
+       (SELECT pbyco FROM NYEO2019_RE_PBYCO_COUNTRY_F WHERE country_code = slope.country_code) AS pbyco,
+       (SELECT cbyco FROM NYEO2019_RE_PBYCO_COUNTRY_F WHERE country_code = slope.country_code) AS cbyco,
+       (SELECT pbykey FROM NYEO2019_FILTER_KEY_CN_AFC WHERE keyword = slope.keyword) AS pbykey,
+       (SELECT cbykey FROM NYEO2019_FILTER_KEY_CN_AFC WHERE keyword = slope.keyword) AS cbykey,
+       slope
+        FROM NYEO2019_FILTER_KEY_CN_SLOPE slope, NYEO2019_FILTER_KEY_CN_FC fc
+        WHERE slope.KEYWORD = fc.keyword AND slope.COUNTRY_CODE = fc.country_code
+    ) R
+    order by country_code, keyword
+ ;
+
+COMMENT ON TABLE NYEO2019_RE_ACT_IN IS '@coreawin 20190906 국가별 키워드 별 활동도 및 영향력';
+COMMENT ON COLUMN NYEO2019_RE_ACT_IN.keyword IS '키워드';
+COMMENT ON COLUMN NYEO2019_RE_ACT_IN.country_code IS '국가';
+create INDEX IDXNYEO_REACTIN_KEY ON NYEO2019_RE_ACT_IN(keyword) NOLOGGING parallel 2;
+create INDEX IDXNYEO_REACTIN_CN ON NYEO2019_RE_ACT_IN(COUNTRY_CODE) NOLOGGING parallel 2;
 
 
 
