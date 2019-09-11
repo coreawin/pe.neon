@@ -14,7 +14,7 @@ public class DownloadScopusData {
     final int port = 5555;
     // final String downloadPath = "d:\\data\\이창환\\20190819\\";
     static String downloadPath = "d:\\data\\20190819\\";
-    static String modelpath = "t:/release/KISTI/SCOPUS_2014_WEB/models/ExportBasicFormat.xlsx";
+    static String modelpath = "d:\\release\\KISTI\\SCOPUS_2014\\models\\ExportBasicFormat.xlsx";
     final DownloadSearchUtil.DOWNLOAD_FILE_FORMAT_TYPE downloadFormat = DownloadSearchUtil.DOWNLOAD_FILE_FORMAT_TYPE.TAB_DELIMITED;
     final String sort = "";
     final boolean isSort = false;
@@ -52,6 +52,11 @@ public class DownloadScopusData {
         selectedField.add(ExportField.FIRST_AUTHOR_EMAIL.name());
         selectedField.add(ExportField.FIRST_AFFILIATION_NAME.name());
 
+        selectedField.add(ExportField.GRANT_AGENCY.name());
+        selectedField.add(ExportField.GRANT_AGENCY_ID.name());
+        selectedField.add(ExportField.GRANT_AGENCY_ACRONYM.name());
+        selectedField.add(ExportField.GRANT_ID.name());
+
         selectedField.add(ExportField.SOURCE_ID.name());
         selectedField.add(ExportField.SOURCE_SOURCETITLE.name());
         selectedField.add(ExportField.SOURCE_VOLUMN.name());
@@ -67,6 +72,10 @@ public class DownloadScopusData {
         selectedField.add(ExportField.CORR_COUNTRYCODE.name());
         selectedField.add(ExportField.CORR_EMAIL.name());
         selectedField.add(ExportField.CORR_AFFILIATION.name());
+
+        selectedField.add(ExportField.OPEN_ACCESS_STATUS.name());
+        selectedField.add(ExportField.OPEN_ACCESS_STATUS_CODE.name());
+        selectedField.add(ExportField.OPEN_ACCESS_URL.name());
     }
 
     public DownloadScopusData(String searchRule) throws Exception {
@@ -77,12 +86,13 @@ public class DownloadScopusData {
     }
 
     public static void main(String... args) throws Exception {
+        System.setProperty("EJIANA_HOME", "d:\\release\\KISTI\\SCOPUS_2014\\WEB-INF\\resources\\") ;
         String searchRule = null;
         for (int idx = 1997; idx <= 2019; idx++) {
-            downloadPath = String.format("d:/data/이창환/20190819/최원준/SCOPUS_KOR_DOCUMENT_%s.tsv", idx);
+            downloadPath = String.format("d:/data/이창환/20190819/최원준/scopus_document/SCOPUS_KOR_DOCUMENT_%s.tsv", idx);
             new File(downloadPath).getParentFile().mkdirs();
             searchRule = String.format("PY=(%s) CU=(KOR)", idx);
-            logger.debug("searchRule {}", searchRule);
+//            searchRule = "eid=(84994872417)";
             logger.debug("download path {}", downloadPath);
             System.out.println(searchRule);
             System.out.println(downloadPath);

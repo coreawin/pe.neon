@@ -57,6 +57,9 @@ public class DownloadSearchUtil {
             new SelectSet(SCOPUS_MARINER_FIELD.XML.getValue(), Protocol.SelectSet.NONE, 300),
             new SelectSet(SCOPUS_MARINER_FIELD.CITEID.getValue(), Protocol.SelectSet.NONE),
             new SelectSet(SCOPUS_MARINER_FIELD.CITCOUNT.getValue(), Protocol.SelectSet.NONE),
+            new SelectSet(SCOPUS_MARINER_FIELD.CITCOUNT.getValue(), Protocol.SelectSet.NONE),
+            new SelectSet(SCOPUS_MARINER_FIELD.OPEN_ACCESS_STATUS.getValue(), Protocol.SelectSet.NONE),
+            new SelectSet("OPEN_ACCESS_URL", Protocol.SelectSet.NONE),
             new SelectSet("weight", Protocol.SelectSet.NONE)};
 
     private static final int DIVISION_COUNT = 1000;
@@ -79,7 +82,6 @@ public class DownloadSearchUtil {
     NumberFormat nf = NumberFormat.getInstance();
 
     /**
-     * @param session        다운로드시 경과정보를 보관하는 session
      * @param ip             검색엔진 ip
      * @param port           검색엔진 포트
      * @param sidx           시작 인덱스
@@ -88,7 +90,6 @@ public class DownloadSearchUtil {
      * @param downloadFormat Export를 위한 포맷정보
      * @param downloadPath   실제 파일이 작성되는 디렉토리 경로
      * @param modelpath      Excel파일로 Export를 수행할때 템플릿 파일이 저장되어 있는 디렉토리 경로
-     * @param sessionID      사용자의 세션ID
      */
     public DownloadSearchUtil(String ip, int port, int sidx, int eidx, String searchRule, String downloadPath,
                               String modelpath, DOWNLOAD_FILE_FORMAT_TYPE downloadFormat) {
@@ -96,7 +97,6 @@ public class DownloadSearchUtil {
     }
 
     /**
-     * @param session        다운로드시 경과정보를 보관하는 session
      * @param ip             검색엔진 ip
      * @param port           검색엔진 포트
      * @param sidx           시작 인덱스
@@ -104,7 +104,6 @@ public class DownloadSearchUtil {
      * @param searchRule     {@link Query} 객체에 대한 Json 문자열
      * @param downloadPath   실제 파일이 작성되는 디렉토리 경로
      * @param modelpath      Excel파일로 Export를 수행할때 템플릿 파일이 저장되어 있는 디렉토리 경로
-     * @param sessionID      사용자의 세션ID
      * @param downloadFormat Export를 위한 포맷정보
      * @param selectedField  사용자가 선택한 필드 정보셋
      */
@@ -126,12 +125,11 @@ public class DownloadSearchUtil {
     }
 
     /**
-     * @param session        다운로드시 경과정보를 보관하는 session
      * @param ip             검색엔진 ip
      * @param port           검색엔진 포트
      * @param documentIDList 문서 ID 정보들
      * @param downloadPath   실제 파일이 작성되는 디렉토리 경로
-     * @param modelpath      Excel파일로 Export를 수행할때 템플릿 파일이 저장되어 있는 디렉토리 경로
+     * @param modelPath      Excel파일로 Export를 수행할때 템플릿 파일이 저장되어 있는 디렉토리 경로
      * @param downloadFormat Export를 위한 포맷정보
      */
     public DownloadSearchUtil(String ip, int port, String documentIDList, String downloadPath, String modelPath,
