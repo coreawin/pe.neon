@@ -33,7 +33,7 @@ from (
     from NYE2019_SCOPUS_KEYWORD_INFO B
     where B.AK_EID is not null
   )
- ) A
+ ) ANYEO2019_SCOPUS_DOCUMENT
  where A.KEYWORD is not null
 ) A;
 COMMENT ON TABLE SCOPUS.NYEO2019_SCOPUS_A_KEYWORD IS '@coreawin 201908. 저자 키워드 정보를 수집한다. 키워드가 없는것은 제외한다.';
