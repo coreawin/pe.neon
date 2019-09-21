@@ -30,7 +30,7 @@ public class DownloadScopusData {
         selectedField.add(ExportField.DOI.name());
         selectedField.add(ExportField.KEYWORD.name());
         selectedField.add(ExportField.INDEX_KEYWORD.name());
-        selectedField.add(ExportField.FIRST_ASJC.name());
+//        selectedField.add(ExportField.FIRST_ASJC.name());
         selectedField.add(ExportField.ASJC.name());
         selectedField.add(ExportField.NUMBER_CITATION.name());
         selectedField.add(ExportField.CITATION.name());
@@ -38,6 +38,7 @@ public class DownloadScopusData {
         selectedField.add(ExportField.REFERENCE.name());
         selectedField.add(ExportField.CITATION_TYPE.name());
 
+        selectedField.add(ExportField.AUTHOR_ID.name());
         selectedField.add(ExportField.AUTHOR_AUTHORINFO.name());
         selectedField.add(ExportField.AUTHOR_NAME.name());
         selectedField.add(ExportField.AUTHOR_COUNTRYCODE.name());
@@ -73,8 +74,8 @@ public class DownloadScopusData {
         selectedField.add(ExportField.CORR_EMAIL.name());
         selectedField.add(ExportField.CORR_AFFILIATION.name());
 
-        selectedField.add(ExportField.OPEN_ACCESS_STATUS.name());
-        selectedField.add(ExportField.OPEN_ACCESS_STATUS_CODE.name());
+//        selectedField.add(ExportField.OPEN_ACCESS_STATUS.name());
+//        selectedField.add(ExportField.OPEN_ACCESS_STATUS_CODE.name());
         selectedField.add(ExportField.OPEN_ACCESS_URL.name());
     }
 
