@@ -202,6 +202,7 @@ create INDEX IDX_NYEO_AKCYD_KW ON NYEO2019_SCOPUS_AKEY_KCYDATA(KEYWORD) nologgin
 '@coreawin 201908.. <br>
 상위 100위 및 문서 건수 10건 이상의 국가별 분류별 키워드에 해당하는 논문들.
 */
+/*
   drop table NYEO2019_SCOPUS_FILTERING_DOC cascade constraints purge;
   create TABLE NYEO2019_SCOPUS_FILTERING_DOC NOLOGGING AS
 	  SELECT eid, PUBLICATION_YEAR, cb.country_code, cb.keyword, cb.asjc_code FROM  NYEO2019_SCOPUS_AKEY_CN_BASE cb, NYEO2019_SCOPUS_AKEY_FILTERING target
@@ -209,7 +210,14 @@ create INDEX IDX_NYEO_AKCYD_KW ON NYEO2019_SCOPUS_AKEY_KCYDATA(KEYWORD) nologgin
 	  --AND cb.KEYWORD ='100% RENEWABLE ENERGY'
   ;
  COMMENT ON TABLE SCOPUS.NYEO2019_SCOPUS_FILTERING_DOC IS '@coreawin 201908.상위 100위 및 문서 건수 10건 이상의 국가별 분류별 키워드에 해당하는 논문들';
+*/
 
+  create TABLE NYEO2019_SCOPUS_FILTERING_DOC_ALL NOLOGGING AS
+	  SELECT eid, PUBLICATION_YEAR, cb.country_code, cb.keyword, cb.asjc_code FROM  NYEO2019_SCOPUS_AKEY_CN_BASE cb, NYEO2019_SCOPUS_AKEY_FILTERING target
+	  where cb.keyword = target.KEYWORD  AND (RANKING <= 100  AND DOC_CNT >=10)
+	  AND cb.KEYWORD ='3D PRINTING' AND cb.COUNTRY_CODE = 'RUS'
+  ;
+ COMMENT ON TABLE SCOPUS.NYEO2019_SCOPUS_FILTERING_DOC_ALL IS '@coreawin 201911. 각소분류에서 상위 100위 및 문서 건수 10건 이상으로 매칭된 키워드를 갖는 논문들';
 
 /* @coreawin 201908. 키워드별 총 건수 및 평균연도구하기
 	KEYWORD | 총건수 | 평균연도(소수점4자리)

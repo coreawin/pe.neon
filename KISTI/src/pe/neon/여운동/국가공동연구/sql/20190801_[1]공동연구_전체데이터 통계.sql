@@ -5,6 +5,7 @@
 
 /*최근 5년간(2014-2018) 논문(article, proceeding, review)에서 발생하는 키워드들을 20개 과학기술분류의 하위분류(4자리코드)에 대해서 찾는다.*/
 -- @coreawin 201908 작업 : 최근 5년간 논문 데이터 구축 ar, cp, re 2014-2018
+-- @coreawin 201911 작업 : 최근 5년간 논문 데이터 구축 ar, cp, re 2014-2018
 --12,776,499건
 
 DROP TABLE SCOPUS_2017_DOCUMENT CASCADE CONSTRAINTS PURGE; --과거 테이블  삭제
@@ -15,6 +16,7 @@ CREATE TABLE NYEO2019_SCOPUS_DOCUMENT nologging AS
     WHERE PUBLICATION_YEAR BETWEEN '2014' AND '2018'
     AND CITATION_TYPE IN ('ar', 'cp', 're')
 ;
+
 COMMENT ON TABLE SCOPUS.NYEO2019_SCOPUS_DOCUMENT IS '@coreawin 201908 작업 : 최근 5년간 논문 데이터 구축 ar, cp, re 2014-2018';
 CREATE INDEX IDX_SUB_DOC_EID ON NYEO2019_SCOPUS_DOCUMENT (EID) nologging parallel 2;
 CREATE INDEX IDX_SUB_DOC_PY ON NYEO2019_SCOPUS_DOCUMENT (PUBLICATION_YEAR) nologging parallel 2;
