@@ -53,6 +53,7 @@ public class DownloadSearchUtil {
      */
     private static final SelectSet[] DOWNLOAD_SELECT_SET = new SelectSet[]{
             new SelectSet(SCOPUS_MARINER_FIELD.EID.getValue(), Protocol.SelectSet.NONE, 300),
+            new SelectSet(SCOPUS_MARINER_FIELD.AFFIL.getValue(), Protocol.SelectSet.NONE),
             new SelectSet(SCOPUS_MARINER_FIELD.DAFFIL.getValue(), Protocol.SelectSet.NONE),
             new SelectSet(SCOPUS_MARINER_FIELD.XML.getValue(), Protocol.SelectSet.NONE, 300),
             new SelectSet(SCOPUS_MARINER_FIELD.CITEID.getValue(), Protocol.SelectSet.NONE),
@@ -271,6 +272,7 @@ public class DownloadSearchUtil {
             }
 
             // int errorCode = r.getErrorCode();
+            logger.warn("*** AFFILIATION을 High School을 찾는것으로 대체되었으므로 주석처리해야 한다.");
             if (r.getRealSize() != 0) {
                 Map<String, String> xmlMap = new LinkedHashMap<String, String>();
                 Map<String, String[]> xmlCitEIDListMap = new LinkedHashMap<String, String[]>();
@@ -279,13 +281,56 @@ public class DownloadSearchUtil {
                 for (int i = 0; i < r.getRealSize(); i++) {
                     String eid = new String(r.getResult(i, 0));
                     eid = eid.trim();
-                    String daffil = new String(r.getResult(i, 1));
+
+                    String affiliation = new String(r.getResult(i, 1));
+                    String daffil = new String(r.getResult(i, 2));
                     String[] daffilArr = new String[0];
                     if (daffil.length() > 0) {
                         daffilArr = daffil.split("(\r\n|\r|\n)");
                     }
 
-                    String xml = new String(r.getResult(i, 2));
+
+                    boolean isSkip = true;
+                    if(affiliation != null){
+                        String[] aff = affiliation.split("(\r\n|\r|\n)");
+                        for(String _aff : aff){
+                            _aff = _aff.trim().toLowerCase().replaceAll("\\s{1,}", " ");
+//                            logger.info("기관 정보 1 column {} : {}", eid, _aff);
+                            if(_aff.indexOf("high") !=-1 && (_aff.indexOf("school") !=-1 || _aff.indexOf(" sch")!=-1) ){
+                                if(_aff.indexOf("high") !=-1 && _aff.indexOf("higher") !=-1){
+
+                                }else{
+                                    logger.info("고등 학교 기관 정보 {}, {}", eid, _aff );
+                                    isSkip = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if(daffilArr.length > 0){
+                        for(String _aff : daffilArr){
+                            _aff = _aff.trim().toLowerCase();
+//                            logger.info("대표 기관 정보 1 column {} : {}", eid, _aff);
+                            if(_aff.indexOf("high") !=-1 && (_aff.indexOf("school") !=-1 || _aff.indexOf(" sch")!=-1) ){
+                                if(_aff.indexOf("high") !=-1 && _aff.indexOf("higher") !=-1){
+
+                                }else{
+                                    logger.info("대표 고등 학교 기관 정보 {}, {} ", eid, _aff );
+                                    isSkip = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if(isSkip){
+                        continue;
+                    }else{
+                        logger.info("기록한다. {}", eid);
+                    }
+
+
+
+                    String xml = new String(r.getResult(i, 3));
                     xml = xml.trim();
                     if (xml.length() < 1) {
                         logger.error("NONE EXIST XML DOCUMENT ID INFO : " + eid);
@@ -299,13 +344,13 @@ public class DownloadSearchUtil {
                     // writer.flush();
                     // writer.close();
 
-                    String citEidList = new String(r.getResult(i, 3));
+                    String citEidList = new String(r.getResult(i, 4));
                     citEidList = citEidList.trim();
                     String[] citEidArr = new String[0];
                     if (citEidList.length() > 0) {
                         citEidArr = citEidList.split("(\\s)");
                     }
-                    String citCount = new String(r.getResult(i, 4));
+                    String citCount = new String(r.getResult(i, 5));
                     citCount = citCount.trim();
                     // logger.debug("XML : {}", xml);
                     xmlMap.put(eid, xml);

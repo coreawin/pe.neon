@@ -90,7 +90,7 @@ public class ExtractData_201908 {
             try {
                 final String TAB = "\t";
                 final String ENTER = "\n";
-                writer = fu.getWriter("d:\\data\\yeo\\20190819\\키워드별MeanYear_소분류별_100등이상10건이상.txt");
+                writer = fu.getWriter("d:\\data\\yeo\\20191102\\키워드별MeanYear_소분류별_100등이상10건이상.txt");
                 writer.write("KEYWORD\t키워드총건수\tMEANYEAR\t");
                 for (String cn : countryList) {
                     writer.write(cn);
@@ -324,11 +324,11 @@ public class ExtractData_201908 {
         BufferedWriter slopeWriter = null;
         try {
             cbyWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20190819/키워드별_국가별_피인용수_cbykey"), "UTF-8"));
+                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20191102/키워드별_국가별_피인용수_cbykey"), "UTF-8"));
             pbyWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20190819/키워드별_국가별_논문수_pbykey"), "UTF-8"));
+                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20191102/키워드별_국가별_논문수_pbykey"), "UTF-8"));
             slopeWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20190819/키워드별_전체성장률_SLOPE"), "UTF-8"));
+                    new OutputStreamWriter(new FileOutputStream("d:/data/yeo/20191102/키워드별_전체성장률_SLOPE"), "UTF-8"));
 
             cbyWriter.write(writeHeader(pe.neon.최원준.ExtractKCountData.DATAKEYTYPE.CBYKEY));
             pbyWriter.write(writeHeader(pe.neon.최원준.ExtractKCountData.DATAKEYTYPE.PBYKEY));
@@ -469,9 +469,9 @@ public class ExtractData_201908 {
     }
 
     public static void main(String[] args) {
-        new ExtractData_201908().countKeywordMeanYearPerCountry();
         try {
             new ExtractData_201908().write키워드국가별피인용수();
+            new ExtractData_201908().countKeywordMeanYearPerCountry();
         } catch (Exception e) {
             e.printStackTrace();
         }

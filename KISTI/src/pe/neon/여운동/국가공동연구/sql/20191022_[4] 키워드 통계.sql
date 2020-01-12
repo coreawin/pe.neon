@@ -56,6 +56,30 @@ create TABLE NYEO2019_COLLECT_FDOC_AFFINFO NOLOGGING AS
 	ORDER BY keyword
 ;
 
-SELECT  /*+ PARALLEL (4) */ keyword, doc.afid, aff.AFFILIATION, aff.COUNTRY_CODE, 논문건수 FROM NYEO2019_COLLECT_FDOC_AFFINFO doc, SCOPUS_KISTI_AFFILIATION aff
-WHERE doc.afid (+)= aff.afid
+/*
+@coreawin 2019-11.13
+필터링된 데이터가 아닌 전체 5년치 데이터의 정보가 필요하다고 요청이와서 해당 정보로 재 추출한다.
+키워드별 국가, 기관, 논문수
+*/
+
+drop table NYEO2019_COLLECT_FDOC_AFFINFO cascade constraints purge;
+create TABLE NYEO2019_COLLECT_FDOC_AFFINFO NOLOGGING AS
+	SELECT  /*+ PARALLEL (4) */ doc.keyword, aff.afid, count(DISTINCT doc.eid) AS "논문건수"
+	FROM NYEO2019_SCOPUS_A_KEYWORD doc, NYEO2019_SCOPUS_AFFIL_FULL aff
+	WHERE doc.eid = aff.eid
+	GROUP BY  keyword, afid
+	ORDER BY keyword
 ;
+/*
+@coreawin 2019-11.13
+5년치 문서에 대한 키워드 논문수, 국가 정보
+키워드별 국가, 기관, 논문수
+*/
+drop table NYEO2019_COLLECT_KEYWORD_ALL cascade constraints purge;
+create TABLE NYEO2019_COLLECT_KEYWORD_ALL NOLOGGING AS
+    SELECT  /*+ PARALLEL (4) */ keyword, doc.afid, aff.AFFILIATION, aff.COUNTRY_CODE, 논문건수 FROM NYEO2019_COLLECT_FDOC_AFFINFO doc, SCOPUS_KISTI_AFFILIATION aff
+    WHERE doc.afid (+)= aff.afid
+;
+
+select kall.* from NYEO2019_COLLECT_KEYWORD_ALL kall, NYEO2019_COLLECT_ASJCCODE cas
+where kall.keyword = cas.keyword;

@@ -21,8 +21,14 @@ public class ExtractPatentKeywordStat {
             "A21B", "A45D", "A47G", "A47J", "A47L", "B01B", "B60M", "B61L", "D06F", "E06C", "F21H", "F21K", "F21L", "F21M", "F21P", "F21Q", "F21S", "F21V", "F21W", "F21Y", "F24B", "F24C", "F24D", "F25C", "F25D", "G08G", "G10K", "H01B", "H01H", "H01K", "H01M", "H01P", "H01R", "H01T", "H02B", "H02G", "H02H", "H02J", "H02K", "H02M"
     };
 
+    String[] ipc29Datas = new String[]{
+            "B60K","B60L","B60N","B60P","B60Q","B60R","B60T","B60W","B62D","F01L","F02B","F02D","F02F","F02M","F02N","F02P","F16J","G01P"
+    };
+
     Set<String> ipc26Set = new HashSet<String>();
     Set<String> ipc27Set = new HashSet<String>();
+
+    Set<String> ipc29Set = new HashSet<String>();
 
     public ExtractPatentKeywordStat() {
         ipcSetup();
@@ -36,10 +42,21 @@ public class ExtractPatentKeywordStat {
             ipc27Set.add(ipc.trim());
         }
         ipc26Set.addAll(ipc27Set);
+
+        for (String ipc : ipc29Datas) {
+            ipc29Set.add(ipc.trim());
+        }
     }
 
     public void readFile() {
-        String fileName = "D:\\git\\pe.neon\\KISTI\\src\\pe\\neon\\여운동\\특허데이터추출\\data\\patent_20191123.txt";
+//        String fileName = "D:\\git\\pe.neon\\KISTI\\src\\pe\\neon\\여운동\\특허데이터추출\\data\\patent_20191123.txt";
+//        String fileName = "d:\\data\\yeo\\20191123\\patent_JP_20191123.txt";
+//        String fileName = "d:\\data\\yeo\\20191123\\patent_US_20191123.txt";
+        String fileName = "d:\\data\\yeo\\20191123\\patent_EP_20191123.txt";
+        String out = "d:\\data\\yeo\\20191123\\EP_29_out.txt";
+
+        boolean is29Set = true;
+
         Map<String, KeywordData> result = new HashMap<String, KeywordData>();
         int realDocument = 0;
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)))) {
@@ -57,9 +74,16 @@ public class ExtractPatentKeywordStat {
                     /*IPC는 대상 문서를 골라내는데 사용한다.*/
                     String clazz4 = ipcFull.substring(0, 4);
 //                    System.out.println("ipcTarget " + clazz4 +"\t" + ipc26Set.contains(clazz4));
-                    if (ipc26Set.contains(clazz4)) {
-                        matchIpc = true;
-                        break;
+                    if(is29Set){
+                        if (ipc29Set.contains(clazz4)) {
+                            matchIpc = true;
+                            break;
+                        }
+                    }else{
+                        if (ipc26Set.contains(clazz4)) {
+                            matchIpc = true;
+                            break;
+                        }
                     }
                 }
                 if (matchIpc == false) {
@@ -117,10 +141,10 @@ public class ExtractPatentKeywordStat {
             e.printStackTrace();
         }
 
-        String out = "d:\\data\\yeo\\20191123\\out.txt";
+
         try(BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(out)), "UTF-8"))){
             Set<String> resultSet = result.keySet();
-            bw.write("키워드\t2014\t2015\t2016\t2017\t2018\t평균연도\t총건수\t한국건수\t일등건수\t일등건수/한국건수\t일등국가\n");
+            bw.write("키워드\t2014\t2015\t2016\t2017\t2018\t평균연도\t총건수\t한국건수\t일등건수\t한국건수/일등건수\t일등국가\n");
             for(String keyword : resultSet){
                 KeywordData kd = result.get(keyword);
                 System.out.println(kd.writeData());
@@ -229,7 +253,7 @@ public class ExtractPatentKeywordStat {
             if(krCount==0){
                 buffer.append(0f);
             }else{
-                buffer.append((float)top1Cn/(float)krCount);
+                buffer.append((float)krCount/(float)top1Cn);
             }
             buffer.append(TAB);
             for(String cn : top1Country){
