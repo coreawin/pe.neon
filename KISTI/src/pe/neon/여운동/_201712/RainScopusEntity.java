@@ -57,7 +57,7 @@ public class RainScopusEntity extends FileRW {
 		this("\\\\COREAWIN\\Documents\\Project\\2017\\KISTI-글로벌학술특허정보분석플랫폼-이관재\\여운동\\201712\\data\\특허");
 	}
 
-	public static <K, V extends Comparable<? super V>> Map<K, V> soryByValues(Map<K, V> map) {
+	public static <K, V extends Comparable<? super V>> Map<K, V> soryByValues(@org.jetbrains.annotations.NotNull Map<K, V> map) {
 		return map.entrySet().stream().sorted()
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 	}

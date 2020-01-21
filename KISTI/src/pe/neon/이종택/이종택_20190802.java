@@ -3,35 +3,7 @@
  */
 package pe.neon.이종택;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import org.bson.Document;
-import org.bson.types.Binary;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import com.diquest.coreawin.common.divisible.DivisionFileWriter;
-//import com.diquest.coreawin.common.divisible.DivisionFileWriter;
 import com.diquest.k.patent.h.CompressUtil;
 import com.diquest.k.patent.jaxb.PatentJAXBParser;
 import com.diquest.k.patent.jaxb.PatentTableData;
@@ -48,6 +20,18 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import org.bson.Document;
+import org.bson.types.Binary;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.*;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+//import com.diquest.coreawin.common.divisible.DivisionFileWriter;
 
 /**
  * @author neon

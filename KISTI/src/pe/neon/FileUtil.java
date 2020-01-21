@@ -1,7 +1,5 @@
 package pe.neon;
 
-import pe.neon.여운동.ExtractKCountData;
-
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
