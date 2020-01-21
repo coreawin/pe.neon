@@ -15,3 +15,5 @@ data : 관련 데이터들을 저장
 data.patent : 특허 관련 항목
 data.scopus : 논문 관련 항목    
 reqdoc : 요구사항 문서
+
+11.
