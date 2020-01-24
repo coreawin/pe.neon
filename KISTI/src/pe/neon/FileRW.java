@@ -4,14 +4,17 @@ import java.io.*;
 
 public abstract class FileRW {
 
+    protected int lineCount = 0;
     protected void readFile(File path) {
         BufferedReader reader = createReader(path, null);
         String line = null;
+        lineCount = 0;
         while (true) {
             try {
                 line = reader.readLine();
-                readline(line);
                 if (line == null) break;
+                lineCount += 1;
+                readline(line);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -48,9 +51,14 @@ public abstract class FileRW {
         if (r != null) {
             try {
                 r.flush();
-                r.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                //ignore;
+            } finally{
+                try {
+                    r.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -62,8 +70,6 @@ public abstract class FileRW {
      */
     public abstract void readline(String line);
 
-    public abstract void writerline();
-
     public BufferedWriter createWriter(File path, String encode) {
         BufferedWriter bw = null;
         if (encode == null) {
@@ -73,8 +79,10 @@ public abstract class FileRW {
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), encode));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            close(bw);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            close(bw);
         }
         return bw;
     }

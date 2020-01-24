@@ -5,13 +5,12 @@ import pe.neon.FileRW;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- * SCOPUS 파일을 읽어 연구적 특성을 구한다.<br>
+ * GPASS download (Patent) 파일을 읽어 연구적 특성을 구한다.<br>
  * 1. 연구성장성 <br>
  * 2. 질적 활동성 격차 <br>
  * 3. 양적 활동성 격차 <br>
@@ -19,22 +18,22 @@ import java.util.TreeMap;
  * @author coreawin
  * @since 2020-01-24
  */
-public class Launcher4Scopus extends FileRW {
+public class Launcher4Patent extends FileRW {
 
     private final String filePath;
 
     /**
      * @param filePath
-     * scopus download file path
+     * patent download file path
      */
-    public Launcher4Scopus(String filePath){
+    public Launcher4Patent(String filePath){
         this.filePath = filePath;
         File dir = new File(filePath);
         if(dir.isDirectory()){
             File[] files = dir.listFiles();
             for(File file : files){
                 beforeProgress();
-                String techName = file.getName().replaceAll("\\.bulk.*$", "");
+                String techName = file.getName().replaceAll("\\.txt", "");
                 System.out.println("Read techName : " + techName);
                 readFile(file);
 
@@ -45,11 +44,15 @@ public class Launcher4Scopus extends FileRW {
     }
 
     enum E_COUNTRYCODE{
-        KOR
+        KR
     }
 
     /**
-     * 실제 논문 파일의 데이터를 읽는다.<br>
+     * 실제 특허 파일의 데이터를 읽는다.<br>
+     * pno
+     * dockind
+     * pnyear
+     * pndate	pnkind	authority	ti	appno	appyear	appdate	firstpriyear	priyear	prino	inventor	inventor-count	assignee	assignee-count	claims-count	independent-claims-count	total-references-cited-count	reference-count	citation-count	non-patent-count	ipc	cpc	app_gp<br>
      * EID
      * TITLE
      * YEAR
@@ -70,10 +73,13 @@ public class Launcher4Scopus extends FileRW {
         //필요한 항목은 연도, 인용수, 국가 정보.
         String[] datas = line.split("\t");
         String eid = datas[0];
-        int year = convertInt(datas[2]);
-        int cnCitaion = convertInt(datas[7]);
-        String affCC = pickFirstCodeUp(datas[8]); //첫번째 국가만 사용 (저자국가가 없다면 대안으로 기관 국가를 사용한다.)
-        String auCC = pickFirstCodeUp(datas[9]); // 첫번째 국가만 사용.
+        int year = convertInt(datas[8]);
+        int cnCitaion = convertInt(datas[21]);
+        String affCC ="";
+        try {
+            affCC = pickFirstCodeUp(datas[25]); //첫번째 국가만 사용 (저자국가가 없다면 대안으로 기관 국가를 사용한다.)
+        }catch(Exception e){}
+        String auCC = pickFirstCodeUp(datas[15]); // 첫번째 국가만 사용.
 
         sumCitation += cnCitaion; // 인용의 총 합을 구한다.;
         sumYear += year; /*연도의 총 합을 구한다. (평균구하기 위해)*/
@@ -95,8 +101,6 @@ public class Launcher4Scopus extends FileRW {
             countryCode = affCC;
         }
         if(!"".equals(countryCode)){
-            countrySet.add(countryCode);
-            /*국가별 인용합계 정보 */
             Integer sumCitation = citationSumPerCountryCode.get(countryCode);
             if(sumCitation == null){
                 sumCitation = 0;
@@ -104,19 +108,11 @@ public class Launcher4Scopus extends FileRW {
             sumCitation += cnCitaion;
             citationSumPerCountryCode.put(countryCode, sumCitation);
 
-            /*국가별 건수 정보 저장.*/
             Integer cnDocument = cnDocumentPerCountryCode.get(countryCode);
             if(cnDocument==null){
                 cnDocument = 0;
             }
             cnDocumentPerCountryCode.put(countryCode, cnDocument + 1);
-
-            /*국가별 연도합계 정보 저장.*/
-            Integer sumYear  = sumYearPerCountryCode.get(countryCode);
-            if(sumYear==null){
-                sumYear = 0;
-            }
-            sumYearPerCountryCode.put(countryCode, sumYear + 1);
         }
 
     }
@@ -159,18 +155,10 @@ public class Launcher4Scopus extends FileRW {
         }
     }
 
-    private Set<String> countrySet = new HashSet<>();
     /**
      * 연도별 발표 건수.
      */
     private Map<Integer, Integer> cnDocumentPerYear = new TreeMap<>();
-
-    /**
-     * 국가별 연도별 발표 건수.
-     * 1st key : 국가명
-     * 2nd key : 연도별
-     */
-    private Map<String, Map<Integer, Integer>> cnDocumentPerYearPerCountryCode = new TreeMap<>();
 
     /**
      * 국가별 CPP 총합<br>
@@ -180,19 +168,6 @@ public class Launcher4Scopus extends FileRW {
      * 국가별 문서건수
      */
     private Map<String, Integer> cnDocumentPerCountryCode = new TreeMap<>();
-
-    /**
-     * 국가별 연도 합계.
-     */
-    private Map<String, Integer> sumYearPerCountryCode = new TreeMap<>();
-
-
-    /**
-     * 국가별 지표정보.
-     */
-    private Map<String, Result> resultPerCountryCode = new TreeMap<>();
-
-
     //인용건수 총 합
     private int sumCitation = 0;
     //연도 합
@@ -235,10 +210,6 @@ public class Launcher4Scopus extends FileRW {
         this.cpp지표 = 0;
         this.avgYear = 0;
         this.cnDocumentPerYear.clear();;
-
-        this.sumYearPerCountryCode.clear();
-        this.cnDocumentPerCountryCode.clear();
-        this.cnDocumentPerYearPerCountryCode.clear();
     }
 
     /**
@@ -252,6 +223,7 @@ public class Launcher4Scopus extends FileRW {
             cpp지표 = sumCitation / cnDocument;
             avgYear = sumYear / cnDocument;
         }
+
 
         double 성장성지표 = 성장성지표구하기();
         double 질적활동성격차 = 질적활동성격차();
@@ -303,7 +275,7 @@ public class Launcher4Scopus extends FileRW {
         double 분모 = 0;
         double 분자 = 0;
         for(int year = minYear ; year<=maxYear ; year++){
-            /*연도별 논문 건수 구하기.*/
+            /*연도별 특허 건수 구하기.*/
             Integer cnDocument = cnDocumentPerYear.get(year);
             if(cnDocument==null) cnDocument = 0;
             분모 += cnDocument;
@@ -316,35 +288,13 @@ public class Launcher4Scopus extends FileRW {
 //        System.out.println(양정성장성지표 + " 양정성장성지표 : " + Math.round((양정성장성지표* round5)) / (double) round5 );
         return Math.round(양정성장성지표* round5) / round5;
     }
-
-    public Map<String, Double>  국가별성장성지표구하기(){
-        // 연도별 발표건수 구하기
-        final double alpha = 0.5;
-        Map<String, Double> 국가별성장성지표 = new TreeMap<>();
-        for(String country : countrySet){
-            Map<Integer, Integer> cnDocumentPerYear = cnDocumentPerYearPerCountryCode.get(country);
-            double 분모 = 0;
-            double 분자 = 0;
-            for(int year = minYear ; year<=maxYear ; year++){
-                /*연도별 논문 건수 구하기.*/
-                Integer cnDocument = cnDocumentPerYear.get(year);
-                if(cnDocument==null) cnDocument = 0;
-                분모 += cnDocument;
-                분자 += cnDocument * Math.pow(alpha, maxYear-year +1);
-            }
-            if(분모==0){
-                국가별성장성지표.put(country, 0d);
-            }else{
-                double 양정성장성지표 = 분자 / 분모;
-                국가별성장성지표.put(country, Math.round(양정성장성지표* round5) / round5);
-            }
-        }
-        return 국가별성장성지표;
-    }
-
     public double 질적활동성격차(){
-        final String korCountryCode = "KOR";
-        double 한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode) / cnDocumentPerCountryCode.get(korCountryCode);
+        final String korCountryCode = E_COUNTRYCODE.KR.name();
+        double 한국의CPP지표 =0d;
+        try {
+            한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode) / cnDocumentPerCountryCode.get(korCountryCode);
+        }catch(Exception e){//ignore
+        }
         double CPP1위국가의CPP지표값 = 0;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
         for(String country : countrySet){
@@ -355,14 +305,21 @@ public class Launcher4Scopus extends FileRW {
         return Math.round(질적활동성격차지표*round5) / round5;
 
     }
-
     //5번째 자리에서 반올림.
     double round5 = 100000d ;
 
     public double 양적활동성격차(){
         //5번째 자리에서 반올림.
-        final String korCountryCode = "KOR";
-        Integer 한국의발표건수 = citationSumPerCountryCode.get(korCountryCode);
+        final String korCountryCode = "KR";
+        Integer 한국의발표건수 = 0;
+        try {
+            한국의발표건수 = citationSumPerCountryCode.get(korCountryCode);
+            if(한국의발표건수 == null){
+                return 0;
+            }
+        }catch(Exception e){
+            return 0;
+        }
         double 발표건수가가장많은건수 = 0d;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
         for(String country : countrySet){
@@ -382,8 +339,8 @@ public class Launcher4Scopus extends FileRW {
     private String pickFirstCodeUp(String src){
         if(src == null) return "";
         src = src.trim();
-        if(src.indexOf(";")!=-1){
-            String[] datas = src.split(";");
+        if(src.indexOf("`")!=-1){
+            String[] datas = src.split("`");
             for(String data : datas){
                 if("".equals(data)) continue;
                 else return data.trim();
@@ -405,13 +362,11 @@ public class Launcher4Scopus extends FileRW {
     }
 
     public static void main(String[] args) {
-        String scopusPath = "d:\\data\\2020\\yeo\\scopus\\202001\\";
-        String resultFilePath = "d:\\data\\2020\\yeo\\scopus\\RESULT_SCOPUS_202001.txt";
-        Launcher4Scopus scopusLauncher = new Launcher4Scopus(scopusPath);
-        scopusLauncher.writer(resultFilePath);
+        String patentPath = "d:\\data\\2020\\yeo\\patent\\202001\\";
+        String resultFilePath = "d:\\data\\2020\\yeo\\patent\\RESULT_PATENT_202001.txt";
+        Launcher4Patent launcher = new Launcher4Patent(patentPath);
+        launcher.writer(resultFilePath);
     }
-
-
     public void writer(String path) {
         final String ENTER = "\r\n";
         final String TAB = "\t";
