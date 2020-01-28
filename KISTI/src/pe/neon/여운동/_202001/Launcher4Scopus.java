@@ -239,6 +239,7 @@ public class Launcher4Scopus extends FileRW {
         this.sumYearPerCountryCode.clear();
         this.cnDocumentPerCountryCode.clear();
         this.cnDocumentPerYearPerCountryCode.clear();
+        this.citationSumPerCountryCode.clear();
     }
 
     /**
@@ -257,18 +258,24 @@ public class Launcher4Scopus extends FileRW {
         double 질적활동성격차 = 질적활동성격차();
         double 양적활동성격차 = 양적활동성격차();
 
-        if(성장성지표 > 0)
+        if(성장성지표 > 0){
             최대성장성지표값 = Math.max(성장성지표, 최대성장성지표값);
-        if(질적활동성격차 > 0)
-            최대질적격차지표값 = Math.max(질적활동성격차, 최대질적격차지표값);
-        if(양적활동성격차 > 0)
-            최대양적격차지표값 = Math.max(양적활동성격차, 최대양적격차지표값);
-        if(성장성지표 > 0)
             최소성장성지표값 = Math.min(성장성지표, 최소성장성지표값);
-        if(질적활동성격차 > 0)
+        }
+        if(질적활동성격차 > 0) {
+            최대질적격차지표값 = Math.max(질적활동성격차, 최대질적격차지표값);
             최소질적격차지표값 = Math.min(질적활동성격차, 최소질적격차지표값);
-        if(양적활동성격차 > 0)
+        }
+        if(양적활동성격차 > 0) {
+            최대양적격차지표값 = Math.max(양적활동성격차, 최대양적격차지표값);
             최소양적격차지표값 = Math.min(양적활동성격차, 최소양적격차지표값);
+        }
+
+        if(cnDocument==0){
+            성장성지표=0;
+            질적활동성격차=0;
+            양적활동성격차=0;
+        }
 
         Result result = new Result();
         result.기술군명 = techName;
@@ -282,6 +289,7 @@ public class Launcher4Scopus extends FileRW {
         Set<String> techNameSet = resultDataMap.keySet();
         for(String techName : techNameSet){
             Result r = resultDataMap.get(techName);
+            System.out.println("표준화 지표 구하기 " + techName);
             r.표준성장성지표 = get표준화지표(r.성장성지표, 최소성장성지표값, 최대성장성지표값);
             r.표준질적활동성격차 = get표준화지표(r.질적활동성격차, 최소질적격차지표값, 최대질적격차지표값);
             r.표준양적활동성격차 = get표준화지표(r.양적활동성격차, 최소양적격차지표값, 최대양적격차지표값);
@@ -293,7 +301,8 @@ public class Launcher4Scopus extends FileRW {
     double round4 = 10000d ;
 
     private double get표준화지표(Double 현재지표, Double 최소지표, Double 최대지표) {
-        double 표준화지표 = ((현재지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8 + 0.1;
+        System.out.println("표준화 지표 : " + 현재지표 +"\t" + 최소지표 +"\t" + 최대지표);
+        double 표준화지표 = ((현재지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8d + 0.1d;
         return Math.round(표준화지표*round4) / round4;
     }
 
@@ -344,7 +353,12 @@ public class Launcher4Scopus extends FileRW {
 
     public double 질적활동성격차(){
         final String korCountryCode = "KOR";
-        double 한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode) / cnDocumentPerCountryCode.get(korCountryCode);
+        double 한국의CPP지표 = 0d;
+        try {
+            한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode) / cnDocumentPerCountryCode.get(korCountryCode);
+        }catch(Exception e){//ignore
+            한국의CPP지표 =0d;
+        }
         double CPP1위국가의CPP지표값 = 0;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
         for(String country : countrySet){
@@ -361,16 +375,26 @@ public class Launcher4Scopus extends FileRW {
 
     public double 양적활동성격차(){
         //5번째 자리에서 반올림.
-        final String korCountryCode = "KOR";
-        Integer 한국의발표건수 = citationSumPerCountryCode.get(korCountryCode);
+        Integer 한국의발표건수 = 0;
         double 발표건수가가장많은건수 = 0d;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
         for(String country : countrySet){
-            발표건수가가장많은건수 = Math.max(발표건수가가장많은건수, cnDocumentPerCountryCode.get((country)));
+            Integer 국가별건수 = cnDocumentPerCountryCode.get((country));
+            발표건수가가장많은건수 = Math.max(발표건수가가장많은건수, 국가별건수);
+            if(E_COUNTRYCODE.KOR.name().equalsIgnoreCase(country)){
+                한국의발표건수 = 국가별건수;
+            }
+//            System.out.println("그외 발견건수. : ==> "+ 발표건수가가장많은건수 +" : " + 국가별건수 +" : " + country);
         }
-        double 양적활동성격차지표 = 1 - (한국의발표건수 / (double)발표건수가가장많은건수);
+        double 양적활동성격차지표 = 1;
+
+        if(한국의발표건수==0){
+            return 양적활동성격차지표;
+        }else{
+            양적활동성격차지표 = 1 - (한국의발표건수 / (double)발표건수가가장많은건수);
+        }
 //        System.out.println("한국의발표건수 : " + 한국의발표건수 +"\t" + 발표건수가가장많은건수);
-//        System.out.println("양적활동성격차지표 : " + 양적활동성격차지표);
+//        System.out.println("양적활동성격차지표 : " + (Math.round(양적활동성격차지표*round5) / round5));
         return Math.round(양적활동성격차지표*round5) / round5;
     }
 
