@@ -4,11 +4,10 @@ import pe.neon.FileRW;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * SCOPUS 파일을 읽어 연구적 특성을 구한다.<br>
@@ -30,14 +29,21 @@ public class Launcher4Scopus extends FileRW {
     public Launcher4Scopus(String filePath){
         this.filePath = filePath;
         File dir = new File(filePath);
+        System.out.println("read directory : " + dir.getAbsolutePath());
         if(dir.isDirectory()){
-            File[] files = dir.listFiles();
+            File[] files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if(name.endsWith("txt"))
+                        return true;
+                    return false;
+                }
+            });
             for(File file : files){
                 beforeProgress();
                 String techName = file.getName().replaceAll("\\.bulk.*$", "");
                 System.out.println("Read techName : " + techName);
                 readFile(file);
-
                 afterProgress(techName);
             }
             표준화지표구하기();
@@ -300,9 +306,9 @@ public class Launcher4Scopus extends FileRW {
     //4번째 자리에서 반올림.
     double round4 = 10000d ;
 
-    private double get표준화지표(Double 현재지표, Double 최소지표, Double 최대지표) {
-        System.out.println("표준화 지표 : " + 현재지표 +"\t" + 최소지표 +"\t" + 최대지표);
-        double 표준화지표 = ((현재지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8d + 0.1d;
+    private double get표준화지표(Double 현재기술군의지표, Double 최소지표, Double 최대지표) {
+        System.out.println("표준화 지표 : " + 현재기술군의지표 +"\t" + 최소지표 +"\t" + 최대지표);
+        double 표준화지표 = ((현재기술군의지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8d + 0.1d;
         return Math.round(표준화지표*round4) / round4;
     }
 
@@ -428,13 +434,29 @@ public class Launcher4Scopus extends FileRW {
         return Integer.parseInt(src);
     }
 
-    public static void main(String[] args) {
-        String scopusPath = "d:\\data\\2020\\yeo\\scopus\\202001\\";
-        String resultFilePath = "d:\\data\\2020\\yeo\\scopus\\RESULT_SCOPUS_202001.txt";
-        Launcher4Scopus scopusLauncher = new Launcher4Scopus(scopusPath);
-        scopusLauncher.writer(resultFilePath);
-    }
+    static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
+    public static void main(String[] args) {
+        String 분과명 = "신재생에너지";
+//        분과명 = "소부장";
+//        분과명 = "혁신성장";
+        분과명 = "add";
+        String 작업일 = dateFormat.format(new Date());
+        작업일 = "20200212";
+        /*scopusPath에는 기술분과명의 폴더명이 있고, 해당 폴더에는 논문/특허 폴더에 각 기술군에 해당하는 SCOPUS raw 데이터가 있다. (download format - tab delim)*/
+        String scopusPath = "d:\\data\\2020\\yeo\\"+작업일+"\\"+분과명+File.separator;
+        File dir = new File(scopusPath);
+        if(dir.isDirectory()){
+            File[] dirs = dir.listFiles();
+            for(File _dir : dirs){
+                String 기술분과명 = _dir.getName();
+                System.out.println("기술분과명 " + 기술분과명);
+                String resultFilePath = _dir.getAbsolutePath() + File.separator + String.format("RESULT_SCOPUS_%s_%s.txt", 기술분과명, 작업일);
+                Launcher4Scopus launcher = new Launcher4Scopus(_dir.getAbsolutePath() +File.separator + "scopus" + File.separator);
+                launcher.writer(resultFilePath);
+            }
+        }
+    }
 
     public void writer(String path) {
         final String ENTER = "\r\n";

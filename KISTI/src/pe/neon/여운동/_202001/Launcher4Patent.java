@@ -4,7 +4,10 @@ import pe.neon.FileRW;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -30,7 +33,14 @@ public class Launcher4Patent extends FileRW {
         this.filePath = filePath;
         File dir = new File(filePath);
         if(dir.isDirectory()){
-            File[] files = dir.listFiles();
+            File[] files = dir.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    if(name.endsWith("txt"))
+                        return true;
+                    return false;
+                }
+            });
             for(File file : files){
                 beforeProgress();
                 String techName = file.getName().replaceAll("\\.txt", "");
@@ -384,11 +394,31 @@ public class Launcher4Patent extends FileRW {
         return Integer.parseInt(src);
     }
 
+    static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
     public static void main(String[] args) {
-        String patentPath = "d:\\data\\2020\\yeo\\patent\\202001\\";
-        String resultFilePath = "d:\\data\\2020\\yeo\\patent\\RESULT_PATENT_202001.txt";
-        Launcher4Patent launcher = new Launcher4Patent(patentPath);
-        launcher.writer(resultFilePath);
+        String 분과명 = "신재생에너지";
+//		분과명 = "소부장";
+//        분과명 = "혁신성장";
+        분과명 = "add";
+        /*scopusPath에는 기술분과명의 폴더명이 있고, 해당 폴더에는 논문/특허 폴더에 각 기술군에 해당하는 SCOPUS raw 데이터가 있다. (download format - tab delim)*/
+        String 작업일 = dateFormat.format(new Date());
+        작업일 = "20200212";
+        String patentPath = "d:\\data\\2020\\yeo\\"+작업일+"\\"+분과명+File.separator;
+        File dir = new File(patentPath);
+        if(dir.isDirectory()){
+            File[] dirs = dir.listFiles();
+            for(File _dir : dirs){
+                String 기술분과명 = _dir.getName();
+                String resultFilePath = _dir.getAbsolutePath() + File.separator + String.format("RESULT_PATENT_%s_%s.txt", 기술분과명, 작업일);
+                Launcher4Patent launcher = new Launcher4Patent(_dir.getAbsolutePath() +File.separator + "patent" + File.separator);
+                launcher.writer(resultFilePath);
+            }
+        }
+//        String patentPath = "d:\\data\\2020\\yeo\\patent\\202001\\";
+//        String resultFilePath = "d:\\data\\2020\\yeo\\patent\\RESULT_PATENT_202001.txt";
+//        Launcher4Patent launcher = new Launcher4Patent(patentPath);
+//        launcher.writer(resultFilePath);
     }
     public void writer(String path) {
         final String ENTER = "\r\n";
