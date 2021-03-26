@@ -443,6 +443,10 @@ public class Launcher4Patent extends FileRW {
 
     private double get표준화지표(Double 현재지표, Double 최소지표, Double 최대지표) {
         double 표준화지표 = ((현재지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8 + 0.1;
+        if(현재지표==0) {
+            System.out.println("원래지표는 " + 표준화지표 +" 이나 격차지표(현재지표) 0인경우에는 표준화값을 0으로 대체한다. " );
+            return 0d;
+        }
         return Math.round(표준화지표*round4) / round4;
     }
 
