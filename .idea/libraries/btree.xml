@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="btree">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/btree.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/diquest-coreawin-util-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/diquest-roamer-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/keyword_extract-1.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/mongo-java-driver-3.5.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/opencsv-4.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/tbjdbc1.6-1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../../eclipse_workspace/workspace_luna/public/KISTI_PATENT-TECH-SENSING_2013_BUILDER/lib/tqk_common.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

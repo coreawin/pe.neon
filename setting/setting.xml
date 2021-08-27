@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<setting isInit="false">
+<!-- 
+	<database jdbc="jdbc:oracle:thin:@203.250.196.44:1551:KISTI5">
+		<id>scopus</id>
+		<pwd>scopus+11</pwd>
+	</database>
+ -->
+ 	<mongodb installPath="">
+ 		<!-- 
+ 		<ip>203.250.228.164</ip>
+ 		<port>27017</port>
+ 		<dbname>KISTI_PATENT</dbname>
+ 		<collection>KISTI_COLL_PATENT</collection>
+ 		 -->
+ 		<ip>203.250.207.75</ip>
+ 		<port>27017</port>
+ 		<dbname>KISTI_PATENT</dbname>
+ 		<collection>US</collection>
+ 		<find type="DBObjectJSON" isAuthority="true">
+            <!-- {"authority" : {"$in":['BE', "BR"]}} --> 
+<!--             {"authority" : {"$in":['US', 'WO', 'GB']}}  -->
+<!--  		     {"authority" : {"$in":['KR','EP','CN']}}  -->
+<!--             {"authority" : {"$in":[ 'DE', 'AU','AT', 'AR', 'BE', 'FR', 'IN', 'CA', 'IT', 'LU', 'TW', 'DK', 'EA', 'ES', 'FI', 'CH',  'BR', 'DD', 'IE', 'MC','MX','NL','PT','RU','SE','SU']}} -->
+ 		</find>
+ 		 <!-- 
+ 		 	isAuthority = true이면 authority별로 데이터를 찾는다.
+ 		  -->
+<!--  		<find type="DBObjectJSON" isAuthority="false"> -->
+<!--  		</find> -->
+ 	</mongodb>
+ 	
+ 	<!-- 
+ 		database > attribute : statistics - true, false (true이면 현재 특허 데이터 구축 통계 정보를 DB에 넣는다.)  TABLE 이름 : KLN_PM_DATA_BUILD_INFO 
+ 	 -->
+	<database use="true" jdbc="jdbc:tibero:thin:@203.250.206.62:8639:KIST02" statistics="true">
+		<id>lexispatent</id>
+		<pwd>Lexispatent+0610</pwd>
+	</database>
+	
+	<reader option="">
+		<xml path=""/>
+		<update path=""/>
+		<new path=""/>
+	</reader>
+	
+	<dic>
+		<!-- NDSL 기관 전거 파일 경로 -->	
+		<ndslAssignee path="D:/LexisNexisPatentJob/KISTI_PATENT_BUILDER/data/" name="KPATPAKPAE.txt"/>
+	</dic>
+	
+	<!--
+	writer option 항목 :  
+		1000이면 일반 문서만 파싱 <br>
+		100이면 일반 문서 파싱 및 키워드 추출용 데이터 파싱 <br>
+		10이면 키워드 추출용 데이터만 파싱.
+	 -->
+	<writer option="1000">
+<!--        <dqdoc path="E:/dqdoc/PATENT_1_2017" name="LEXIS_PATENT_1_2017"/> -->
+<!--        <dqdoc path="E:/dqdoc/PATENT_2_2017" name="LEXIS_PATENT_2017"/> -->
+<!--        <dqdoc path="E:/dqdoc/PATENT_3_2017" name="LEXIS_PATENT_2017"/> -->
+		<dqdoc path="E:/dqdoc/PATENT_4_2017" name="LEXIS_PATENT_2017"/>
+<!-- 		<dqdoc path="" name=""/> -->
+		<!-- 출원인 검색을 위한 DQDOC OPTIONAL -->
+		<assigneeDqdoc path=""/>
+		<!-- dqdoc path="/home/kisti/patent/dqdoc/"/ -->
+		<work path=""/>
+		<parsing path=""/>
+	</writer>
+	
+</setting>
