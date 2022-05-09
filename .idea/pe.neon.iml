@@ -12,6 +12,29 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="fr.opensagres.xdocreport:org.apache.poi.xwpf.converter:0.9.8" level="project" />
+    <orderEntry type="library" name="user" level="project" />
+    <orderEntry type="library" name="org.simpleframework:simple-xml:2.7.1" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.8.6" level="project" />
+    <orderEntry type="library" name="btree" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/user/tqk-common.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/user/tqk_common.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
     <orderEntry type="library" name="Maven: org.apache.poi:poi:4.1.1" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.13" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.4" level="project" />
@@ -21,8 +44,15 @@
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:3.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.19" level="project" />
     <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.06" level="project" />
-    <orderEntry type="library" name="Maven: org.jetbrains:annotations-java5:18.0.0" level="project" />
-    <orderEntry type="library" name="fr.opensagres.xdocreport:org.apache.poi.xwpf.converter:0.9.8" level="project" />
-    <orderEntry type="library" name="user" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains:annotations-java5:22.0.0" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../kisti_patent_builder/target/lexisnexis-patent-builder-3.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

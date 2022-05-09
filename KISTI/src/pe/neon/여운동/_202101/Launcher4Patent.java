@@ -477,25 +477,31 @@ public class Launcher4Patent extends FileRW {
         }catch(Exception e){//ignore
             한국의CPP지표 =0d;
         }
-        System.out.println("한국의CPP지표 : " + 한국의CPP지표 +"/" + citationSumPerCountryCode.get(korCountryCode));
+        System.out.println("국가별 문서 건수 : " + cnDocumentPerCountryCode);
+        System.out.println("국가별 인용 건수 : " + citationSumPerCountryCode);
+//        System.out.println("한국의CPP지표 : " + 한국의CPP지표 +" = " + citationSumPerCountryCode.get(korCountryCode).doubleValue() +" / "+cnDocumentPerCountryCode.get(korCountryCode));
         String CPP1위국가 = "";
-        Integer CPP1위건수 = 0;
+        Double CPP1위국가의CPP지표값 = 0d;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
         if(countrySet.size()==0) return 0d;
         System.out.println("countrySet "+ countrySet);
         for(String country : countrySet) {
             int 국가별CPP건수 = citationSumPerCountryCode.get(country);
+            double 국가별CPP지표 = 0d;
+            try {
+                국가별CPP지표 = citationSumPerCountryCode.get(country).doubleValue() / cnDocumentPerCountryCode.get(country).doubleValue();
+            }catch(Exception e){}
             if("".equals(CPP1위국가)){
                 CPP1위국가 = country;
             }
-            if(CPP1위건수 < 국가별CPP건수){
+            if(CPP1위국가의CPP지표값 < 국가별CPP지표){
                 CPP1위국가 = country;
             }
-            CPP1위건수 = Math.max(CPP1위건수, 국가별CPP건수);
+            CPP1위국가의CPP지표값 = Math.max(CPP1위국가의CPP지표값, 국가별CPP지표);
         }
-        System.out.println("CPP1위국가 = " + CPP1위국가+"/" + CPP1위건수);
-        double CPP1위국가의CPP지표값 = citationSumPerCountryCode.get(CPP1위국가).doubleValue() / cnDocumentPerCountryCode.get(CPP1위국가).doubleValue();;
-        System.out.println("CPP1위국가 = " + CPP1위국가+"("+CPP1위국가의CPP지표값+")" +"/" + CPP1위건수);
+
+        System.out.println("CPP1위국가 = " + CPP1위국가+"("+CPP1위국가의CPP지표값+")" +"/" + cnDocumentPerCountryCode.get(CPP1위국가));
+        System.out.println("CPP1위의 CPP지표 : " + CPP1위국가의CPP지표값 +" = " + citationSumPerCountryCode.get(CPP1위국가).doubleValue() +" / "+cnDocumentPerCountryCode.get(CPP1위국가));
 
 //        for(String country : countrySet){
 //            double 국가별CPP지표값 = citationSumPerCountryCode.get(country).doubleValue() / cnDocumentPerCountryCode.get(country).doubleValue();
@@ -576,7 +582,8 @@ public class Launcher4Patent extends FileRW {
     static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     public static void main(String[] args) {
-        String targetData = "20210327";
+        String targetData = "20210126";
+        targetData = "20210423";
         /*patentPath에는 기술분과명의 폴더명이 있고, 해당 폴더에는 논문/특허 폴더에 각 기술군에 해당하는 PATENT raw 데이터가 있다. (download format - tab delim)*/
         String patentPath = "d:\\data\\2021\\박진현-미소\\download\\"+targetData+"\\";
         File dir = new File(patentPath);

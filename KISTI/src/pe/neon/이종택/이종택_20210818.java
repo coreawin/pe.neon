@@ -5,11 +5,11 @@ package pe.neon.이종택;
 
 import com.diquest.coreawin.common.divisible.DivisionFileWriter;
 import com.diquest.k.patent.h.CompressUtil;
-import com.diquest.k.patent.jaxb.PatentJAXBParser;
-import com.diquest.k.patent.jaxb.PatentTableData;
-import com.diquest.k.patent.jaxb.bean.IPatentDataWriter;
-import com.diquest.k.patent.jaxb.bean.PTClassification;
-import com.diquest.k.patent.jaxb.bean.PTDocumentIDInfo;
+import com.diquest.k.patent.jaxb.PatentJAXBParser2020;
+import com.diquest.k.patent.jaxb.PatentTableData2020;
+import com.diquest.k.patent.jaxb.bean2020.IPatentDataWriter;
+import com.diquest.k.patent.jaxb.bean2020.PTClassification;
+import com.diquest.k.patent.jaxb.bean2020.PTDocumentIDInfo;
 import com.diquest.k.patent.nosql.MongoDBConnector;
 import com.diquest.k.patent.nosql.MongoDB_Option;
 import com.mongodb.*;
@@ -36,7 +36,7 @@ import java.util.*;
  * @date 2013. 4. 19.
  * @Version 1.0
  */
-public class 이종택_20200818 {
+public class 이종택_20210818 {
 	Logger mongoLogger = LoggerFactory.getLogger(getClass());
 	/**
 	 * @throws Exception
@@ -116,8 +116,8 @@ public class 이종택_20200818 {
 	}
 
 	MongoDatabase db = null;
-	PatentTableData ptd = PatentTableData.getInstance();
-	PatentJAXBParser parser = null;
+	PatentTableData2020 ptd = PatentTableData2020.getInstance();
+	PatentJAXBParser2020 parser = null;
 
 	Map<String, MongoCollection<Document>> collectionPool = new HashMap<String, MongoCollection<Document>>();
 	Map<String, Set<String>> auPnos = new HashMap<String, Set<String>>();
@@ -126,6 +126,7 @@ public class 이종택_20200818 {
 		auPnos.clear();
 		StringBuilder buff1 = new StringBuilder();
 		StringBuilder buff2 = new StringBuilder();
+//		mongoLogger.info("ref pno list : {}" , pnoList);
 		for (String pno : pnoList) {
 			String au = pno.substring(0, 2);
 			Set<String> sets = auPnos.get(au);
@@ -165,7 +166,7 @@ public class 이종택_20200818 {
 					Binary bi = (Binary) d.get("xml");
 					xml = CompressUtil.getInstance().unCompress(bi.getData());
 					InputStream xmlis = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-					ptd.processPatentDataInit(parser.unmarshal(xmlis));
+					ptd.processPatentDataInit(parser.unmarshal_type(xmlis));
 					String pno = ptd.publication.pno;
 					List<IPatentDataWriter> ipcList = ptd.ipc.mainList;
 					ipcList.addAll(ptd.ipc.ipcList);
@@ -185,7 +186,7 @@ public class 이종택_20200818 {
 				}
 			}
 		}
-		mongoLogger.info("reference datas build complete : "+ pnoList.size());
+//		mongoLogger.info("reference datas build complete : "+ pnoList.size());
 		return new String[] { buff1.toString(), buff2.toString() };
 	}
 	final String TAB = "\t";
@@ -198,11 +199,11 @@ public class 이종택_20200818 {
 		mc = MongoDBConnector.getInstance("203.250.207.75", 27017);
 		db = mc.getDatabase("KISTI_2017_PATENT");
 		try {
-			parser = new PatentJAXBParser();
+			parser = new PatentJAXBParser2020();
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-		PatentTableData ptd = PatentTableData.getInstance();
+		PatentTableData2020 ptd = PatentTableData2020.getInstance();
 		Set<String> set = new TreeSet<String>();
 		DivisionFileWriter w4 = new DivisionFileWriter("d:\\data\\us.grant.2017.ref.ipc.txt");
 		DivisionFileWriter w5 = new DivisionFileWriter("d:\\data\\us.grant.2017.ref.publication.txt");
@@ -276,8 +277,13 @@ public class 이종택_20200818 {
 	 @Test
 	public void testWriteParseFromMongoDB() throws Exception {
 		String pyear = "2020";
-		String folderDate = "20210818";
-		mongoLogger.info("20210818  이종택 mission");
+		String folderDate = "20210827";
+		String downloadPath = String.format("d:\\data\\이종택\\%s\\", folderDate);
+		mongoLogger.info("download path : {}", downloadPath);
+		File f = new File(downloadPath);
+		f.delete();
+		f.mkdirs();
+		mongoLogger.info("20210827  이종택 mission");
 		System.setProperty("DEBUG.MONGO", "false");
 
 		mc = MongoDBConnector.getInstance("172.10.200.225", 27017);
@@ -286,7 +292,7 @@ public class 이종택_20200818 {
 		MongoCollection<Document> collection = db.getCollection("US");
 //		 DBCollection col = db.getCollection("US");
 		BasicDBObject doc = new BasicDBObject("pyear", pyear);
-		FindIterable<Document> fIter = collection.find(Filters.eq("pyear", pyear)).limit(10).noCursorTimeout(true);
+		FindIterable<Document> fIter = collection.find(Filters.eq("pyear", pyear)).noCursorTimeout(true);
 
 
 //		 doc = new BasicDBObject("_id", "US10524410");
@@ -306,9 +312,9 @@ public class 이종택_20200818 {
 		// int total = cur.count();
 		long total = collection.count(Filters.eq("pyear", pyear));
 
-		mongoLogger.info("total : " + total);
-		parser = new PatentJAXBParser();
-		PatentTableData ptd = PatentTableData.getInstance();
+//		mongoLogger.info("total : " + total);
+		parser = new PatentJAXBParser2020();
+		PatentTableData2020 ptd = PatentTableData2020.getInstance();
 		DivisionFileWriter w1 = new DivisionFileWriter(String.format("d:\\data\\이종택\\%s\\us.grant.%s.backward.txt", folderDate, pyear));
 		DivisionFileWriter w2 = new DivisionFileWriter(String.format("d:\\data\\이종택\\%s\\us.grant.%s.ipc.txt", folderDate, pyear));
 		DivisionFileWriter w3 = new DivisionFileWriter(String.format("d:\\data\\이종택\\%s\\us.grant.%s.publication.txt", folderDate, pyear));
@@ -321,14 +327,24 @@ public class 이종택_20200818 {
 			Document docu = mCur.next();
 			try {
 				Binary bi = (Binary) docu.get("xml");
+				String n_pndate = String.valueOf(docu.get("pndate"));
+				String n_pyear = String.valueOf(docu.get("pyear"));
+				String n_authority = String.valueOf(docu.get("authority"));
+
 				String xml = CompressUtil.getInstance().unCompress(bi.getData());
-				 mongoLogger.info(xml);
+//				 mongoLogger.info(xml);
 				InputStream xmlis = new ByteArrayInputStream(xml.getBytes("UTF-8"));
-				ptd.processPatentDataInit(parser.unmarshal(xmlis));
+				ptd.processPatentDataInit(parser.unmarshal_type(xmlis));
 				String publ_type = ptd.publication.publ_type.toString();
 				if ("grant".equalsIgnoreCase(publ_type)) {
 					String pno = ptd.publication.pno;
-					// mongoLogger.info(pno);
+					String pnoFilePath = downloadPath + "xml/" +pno +".xml";
+//					mongoLogger.info("pno : {} : {}", pno , pnoFilePath);
+//					BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(pnoFilePath))));
+//					bw.write(xml);
+//					bw.close();
+//					mongoLogger.info("pno : {}", pno);
+//					 mongoLogger.info("xml : {}", xml);
 					// mongoLogger.info(pno +"\t" + ptd.citations.toString());
 					// w1.write(pno +"\t"+ptd.publication.documentID.date+"\n");
 					List<IPatentDataWriter> citedList = ptd.citations.citedList;
@@ -351,15 +367,16 @@ public class 이종택_20200818 {
 					String ipclist = removeDupIPC(ipcList);
 					w2.write(pno + TAB + ipclist + ENTER);
 					String dockind = ptd.publication.publ_type;
-					String pndate = ptd.publication.documentID.date;
-					String pnyear = "";
-					if (pndate != null) {
-						pnyear = pndate.length() > 3 ? pndate.substring(0, 4) : "";
-					}
+//					String pndate = ptd.publication.documentID.date;
+//					String pnyear = "";
+//					if (pndate != null) {
+//						pnyear = pndate.length() > 3 ? pndate.substring(0, 4) : "";
+//					}
 					String pnkind = ptd.publication.documentID.kind;
-					String authority = ptd.publication.documentID.country_code;
-					w3.write(pno + TAB + dockind + TAB + pnyear + TAB + pndate + TAB + pnkind + TAB + authority + ENTER);
-					mongoLogger.info("w3 line : {}", pno + TAB + dockind + TAB + pnyear + TAB + pndate + TAB + pnkind + TAB + authority);
+
+
+					w3.write(pno + TAB + dockind + TAB + n_pyear + TAB + n_pndate + TAB + pnkind + TAB + n_authority + ENTER);
+//					mongoLogger.info("w3 line : {}", pno + TAB + dockind + TAB + n_pyear + TAB + n_pndate + TAB + pnkind + TAB + n_authority);
 					 String[] refInfos = retrievePnoList(refList);
 					 w4.write(refInfos[0]);
 					 w5.write(refInfos[1]);
@@ -378,7 +395,15 @@ public class 이종택_20200818 {
 					// mongoLogger.info(ptd.application.lineData());
 					// mongoLogger.info(ptd.title.lineData());
 					if (grantCnt % 1000 == 0) {
-						mongoLogger.info("progress grantCnt(332,483) : " + grantCnt + "/332,483");
+						mongoLogger.info("progress grant cnt(390,578) : " + grantCnt + "/390,578");
+					}
+					if (grantCnt % 10000 == 0) {
+						mongoLogger.info("flusing...");
+						w1.flush();
+						w2.flush();
+						w3.flush();
+						w4.flush();
+						w5.flush();
 					}
 					grantCnt++;
 				}

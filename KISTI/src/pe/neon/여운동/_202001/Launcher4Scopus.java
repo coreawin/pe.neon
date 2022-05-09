@@ -65,7 +65,7 @@ public class Launcher4Scopus extends FileRW {
      * ASJC
      * NUMBER_CITATION
      * AFFILIATION_COUNTRY
-     * FIRST_AUTHOR_COUNTRYCODE
+     * FIRST_AUTHOR_COUNTRYCODnE
      * FIRST_AFFILIATION_NAME
      * SOURCE_SOURCETITLE
      * @param line
@@ -440,9 +440,8 @@ public class Launcher4Scopus extends FileRW {
         String 분과명 = "신재생에너지";
 //        분과명 = "소부장";
 //        분과명 = "혁신성장";
-        분과명 = "add";
+        분과명 = "0213";
         String 작업일 = dateFormat.format(new Date());
-        작업일 = "20200212";
         /*scopusPath에는 기술분과명의 폴더명이 있고, 해당 폴더에는 논문/특허 폴더에 각 기술군에 해당하는 SCOPUS raw 데이터가 있다. (download format - tab delim)*/
         String scopusPath = "d:\\data\\2020\\yeo\\"+작업일+"\\"+분과명+File.separator;
         File dir = new File(scopusPath);

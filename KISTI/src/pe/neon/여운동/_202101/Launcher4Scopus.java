@@ -42,6 +42,7 @@ public class Launcher4Scopus extends FileRW {
             for(File file : files){
                 beforeProgress();
                 String techName = file.getName().replaceAll("\\.bulk.*$", "");
+                techName = file.getName().replaceAll("\\.txt", "");
                 System.out.println("Read techName : " + techName);
                 readFile(file);
                 afterProgress(techName);
@@ -324,6 +325,10 @@ public class Launcher4Scopus extends FileRW {
 
 
         double 표준화지표 = ((현재기술군의지표 - 최소지표) / (최대지표 - 최소지표)) * 0.8d + 0.1d;
+//        if(현재기술군의지표==0) {
+//            System.out.println("원래지표는 " + 표준화지표 +" 이나 격차지표(현재지표) 0인경우에는 표준화값을 0으로 대체한다. " );
+//            return 0d;
+//        }
         return Math.round(표준화지표*round4) / round4;
     }
 
@@ -376,7 +381,7 @@ public class Launcher4Scopus extends FileRW {
         final String korCountryCode = "KOR";
         double 한국의CPP지표 = 0d;
         try {
-            한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode) / cnDocumentPerCountryCode.get(korCountryCode);
+            한국의CPP지표 = citationSumPerCountryCode.get(korCountryCode).doubleValue() / cnDocumentPerCountryCode.get(korCountryCode).doubleValue();
         }catch(Exception e){//ignore
             한국의CPP지표 =0d;
 
@@ -385,23 +390,47 @@ public class Launcher4Scopus extends FileRW {
             System.out.println("✪✪✪✪✪✪✪✪✪✪ 한국의 특허 CPP 건수가 0이다. ");
         }
 
-
-
-        System.out.println(citationSumPerCountryCode);
-        System.out.println("한국의 CPP지표 : " + 한국의CPP지표 +"\t" + citationSumPerCountryCode.get(korCountryCode) +"\t" + cnDocumentPerCountryCode.get(korCountryCode));
-
-        double CPP1위국가의CPP지표값 = 0;
+        String CPP1위국가 = "";
+        Integer CPP1위건수 = 0;
+        Double CPP1위국가의CPP지표값 = 0d;
         Set<String> countrySet = cnDocumentPerCountryCode.keySet();
+        if(countrySet.size()==0) return 0d;
+        System.out.println("countrySet "+ countrySet);
+        for(String country : countrySet) {
+            int 국가별CPP건수 = citationSumPerCountryCode.get(country);
+            double 국가별CPP지표 = 0d;
+            try {
+                국가별CPP지표 = citationSumPerCountryCode.get(country).doubleValue() / cnDocumentPerCountryCode.get(country).doubleValue();
+            }catch(Exception e){}
+            if("".equals(CPP1위국가)){
+                CPP1위국가 = country;
+            }
+            if(CPP1위국가의CPP지표값 < 국가별CPP지표){
+                CPP1위국가 = country;
+            }
+            CPP1위국가의CPP지표값 = Math.max(CPP1위국가의CPP지표값, 국가별CPP지표);
+        }
+//        System.out.println("CPP1위국가 = " + CPP1위국가+"/" + CPP1위건수);
+//        double CPP1위국가의CPP지표값 = citationSumPerCountryCode.get(CPP1위국가).doubleValue() / cnDocumentPerCountryCode.get(CPP1위국가).doubleValue();;
+//        System.out.println("CPP1위국가 = " + CPP1위국가+"("+CPP1위국가의CPP지표값+")" +"/" + CPP1위건수);
 
-        int 국가별CPP건수 = 0;
-        for(String country : countrySet){
-            국가별CPP건수 += cnDocumentPerCountryCode.get(country);
-            double 국가별CPP지표값 = citationSumPerCountryCode.get(country) / cnDocumentPerCountryCode.get(country);
-            CPP1위국가의CPP지표값 = Math.max(CPP1위국가의CPP지표값, 국가별CPP지표값);
-        }
-        if(국가별CPP건수==0){
-            System.out.println("✪✪✪✪✪✪✪✪✪✪ 국가별 CPP건수 0이다. ");
-        }
+
+
+//        System.out.println(citationSumPerCountryCode);
+//        System.out.println("한국의 CPP지표 : " + 한국의CPP지표 +"\t" + citationSumPerCountryCode.get(korCountryCode) +"\t" + cnDocumentPerCountryCode.get(korCountryCode));
+//
+//        double CPP1위국가의CPP지표값 = 0;
+//        Set<String> countrySet = cnDocumentPerCountryCode.keySet();
+//
+//        int 국가별CPP건수 = 0;
+//        for(String country : countrySet){
+//            국가별CPP건수 += cnDocumentPerCountryCode.get(country);
+//            double 국가별CPP지표값 = citationSumPerCountryCode.get(country).doubleValue() / cnDocumentPerCountryCode.get(country).doubleValue();
+//            CPP1위국가의CPP지표값 = Math.max(CPP1위국가의CPP지표값, 국가별CPP지표값);
+//        }
+//        if(국가별CPP건수==0){
+//            System.out.println("✪✪✪✪✪✪✪✪✪✪ 국가별 CPP건수 0이다. ");
+//        }
         System.out.println("CPP1위국가의CPP지표값 : " + CPP1위국가의CPP지표값 );
         double 질적활동성격차지표 = 1 - (한국의CPP지표 / CPP1위국가의CPP지표값);
 
@@ -473,7 +502,7 @@ public class Launcher4Scopus extends FileRW {
     static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     public static void main(String[] args) {
-        String targetData = "20210327";
+        String targetData = "20210423";
         /*scopusPath에는 기술분과명의 폴더명이 있고, 해당 폴더에는 논문/특허 폴더에 각 기술군에 해당하는 SCOPUS raw 데이터가 있다. (download format - tab delim)*/
         String scopusPath = "d:\\data\\2021\\박진현-미소\\download\\"+targetData+"\\";
         File dir = new File(scopusPath);

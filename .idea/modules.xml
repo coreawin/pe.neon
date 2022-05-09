@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../../IdeaProjects/WorkpediaAudioCheck/WorkpediaAudioCheck.iml" filepath="$PROJECT_DIR$/../../IdeaProjects/WorkpediaAudioCheck/WorkpediaAudioCheck.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/pe.neon.iml" filepath="$PROJECT_DIR$/.idea/pe.neon.iml" />
     </modules>
   </component>
