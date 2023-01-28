@@ -103,11 +103,14 @@ public class DownloadScopusAuthorOccidData {
             MongoCollection<Document> collection = mongodb.getCollection("SCOPUS");
             total = collection.count();
             logger.info("탐색 전체 갯수 : {}", total);
+            System.out.println("탐색 전체 갯수 : " + total);
             FindIterable<Document> cur = collection.find();
             cur.noCursorTimeout(true);
             for (Document doc : cur) {
                 if (counter % 10000 == 0) {
-                    logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2010년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+                    logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+
                 }
 
                 Binary b = (Binary) (doc.get("xml"));
@@ -120,7 +123,7 @@ public class DownloadScopusAuthorOccidData {
                 }
 
                 counter += 1;
-                if (pubyear < 2010) {
+                if (pubyear < 2015) {
                     continue;
                 }
                 gte2010 += 1;
@@ -131,14 +134,17 @@ public class DownloadScopusAuthorOccidData {
                     findOrcidCounter += 1;
                 }
                 if (gte2010 % 1000 == 0) {
-                    logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2010년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+                    logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+
                 }
 
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        logger.info(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2010년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+        logger.info(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+        System.out.println(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
 
     }
 
@@ -146,7 +152,11 @@ public class DownloadScopusAuthorOccidData {
     Logger logger = LoggerFactory.getLogger(getClass());
 
     public static void main(String... args) throws Exception {
+
+        System.out.println("executor " + args.length);
+
         if (args.length > 0) {
+            System.out.println("===> " + args[0].trim());
             new DownloadScopusAuthorOccidData().connectMongoDB(args[0].trim());
         } else {
             String path = "d:\\data\\27.최현규\\authorData\\scopus_occid_data_202301.txt";
