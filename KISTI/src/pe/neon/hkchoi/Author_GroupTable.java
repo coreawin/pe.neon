@@ -29,19 +29,19 @@ public class Author_GroupTable extends TableBean {
     /**
      * authorgroup_list
      */
-    private LinkedList<Author_Group_TP> authorgroup_list;
+    private LinkedList<Author_Group_TP> authorgroup_list = new LinkedList<Author_Group_TP>();
 
     /**
      * author_list
      */
-    private LinkedList<Author> author_list;
+    private LinkedList<Author> author_list = new LinkedList<Author>();;
 
-    private LinkedList<Collaboration> collaborationList;
+    private LinkedList<Collaboration> collaborationList = new LinkedList<Collaboration>();
 
     /**
      * checkDuplication
      */
-    private HashSet<String> checkDuplication = null;
+    private HashSet<String> checkDuplication = new HashSet<String>();
 
     private boolean existOrcId = false;
 
@@ -57,18 +57,23 @@ public class Author_GroupTable extends TableBean {
      * mirian .load.scopus.bean.DocTp)
      */
     public void initValues(DocTp document) {
-        author_list = new LinkedList<Author>();
+        author_list.clear();
+        existOrcId = false;
+        checkDuplication.clear();
+        collaborationList.clear();
+        authorgroup_list.clear();
+        eid = null;
         setAuthorGroup(document);
     }
 
     @SuppressWarnings("unchecked")
     private void setAuthorGroup(DocTp document) {
         List<AuthorGroupTp> groupTp = document.getItem().getItem().getBibrecord().getHead().getAuthorGroup();
-        checkDuplication = new HashSet<String>();
-        authorgroup_list = new LinkedList<Author_Group_TP>();
-        collaborationList = new LinkedList<Collaboration>();
+//        checkDuplication = new HashSet<String>();
+//        authorgroup_list = new LinkedList<Author_Group_TP>();
+//        collaborationList = new LinkedList<Collaboration>();
         // correspondAuthor = new LinkedList<CorrespondAuthorTable>();
-        author_list = new LinkedList<Author>();
+//        author_list = new LinkedList<Author>();
 
         this.eid = document.getMeta().getEid();
         for (int group_seq = 0; group_seq < groupTp.size(); group_seq++) {
@@ -453,6 +458,10 @@ public class Author_GroupTable extends TableBean {
             String orc_id = a.orc_id;
             if(orc_id!=null){
                 sb.append(a.getName());
+                sb.append(TAB);
+                sb.append(a.getSurname());
+                sb.append(" ");
+                sb.append(a.getGiven_name());
                 sb.append(TAB);
                 sb.append(a.getAuthor_id());
                 sb.append(TAB);

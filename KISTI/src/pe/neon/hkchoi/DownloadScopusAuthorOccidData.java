@@ -30,6 +30,8 @@ public class DownloadScopusAuthorOccidData {
 
     Author_GroupTable table = new Author_GroupTable();
 
+    JAXBContext jc= null;
+
     protected JAXBElement<?> unmarshall(String xml, boolean sec) throws Exception {
         JAXBElement<?> obj = null;
         InputStream stream = null;
@@ -46,12 +48,17 @@ public class DownloadScopusAuthorOccidData {
         return obj;
     }
 
-    public String extractOccid(String xml) {
-        JAXBContext jc;
+    private void initMarshaller(){
         try {
             jc = JAXBContext.newInstance(SCOPUS_PACKAGE);
             this.unmarshaller = jc.createUnmarshaller();
+        }catch(Exception e){
+            e.printStackTrace();;
+        }
+    }
 
+    public String extractOccid(String xml) {
+        try {
             JAXBElement<?> obj = null;
             DocTp root = null;
             String eid = "";
@@ -77,7 +84,7 @@ public class DownloadScopusAuthorOccidData {
                 obj = null;
                 root = null;
             }
-        } catch (JAXBException e) {
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -90,6 +97,7 @@ public class DownloadScopusAuthorOccidData {
     protected Unmarshaller unmarshaller;
 
     public void connectMongoDB(String path) {
+        initMarshaller();
         MongoClient client = null;
         long total = 0;
         long counter = 0;
@@ -103,13 +111,13 @@ public class DownloadScopusAuthorOccidData {
             MongoCollection<Document> collection = mongodb.getCollection("SCOPUS");
             total = collection.count();
             logger.info("탐색 전체 갯수 : {}", total);
-            System.out.println("탐색 전체 갯수 : " + total);
+//            System.out.println("탐색 전체 갯수 : " + total);
             FindIterable<Document> cur = collection.find();
             cur.noCursorTimeout(true);
             for (Document doc : cur) {
                 if (counter % 10000 == 0) {
                     logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
-                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+//                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
 
                 }
 
@@ -133,9 +141,9 @@ public class DownloadScopusAuthorOccidData {
                     w1.write(resultData);
                     findOrcidCounter += 1;
                 }
-                if (gte2010 % 1000 == 0) {
+                if (gte2010 % 10000 == 0) {
                     logger.info(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
-                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+//                    System.out.println(String.format("SCOPUS 데이터 진행 확인  orcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
 
                 }
 
@@ -144,7 +152,7 @@ public class DownloadScopusAuthorOccidData {
             e.printStackTrace();
         }
         logger.info(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
-        System.out.println(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
+//        System.out.println(String.format("SCOPUS 데이터 추출 완료  o  rcid 발견 건수 : %s / 진행건수 : %s / 총건수 : %s / 2015년 이후 건수 : %s ", NumberFormat.getInstance().format(findOrcidCounter), NumberFormat.getInstance().format(counter), NumberFormat.getInstance().format(total), NumberFormat.getInstance().format(gte2010)));
 
     }
 

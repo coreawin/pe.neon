@@ -3,22 +3,105 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>coreawin</groupId>
     <artifactId>pe.neon</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1</version>
+
+
     <build>
+        <sourceDirectory>KISTI/src</sourceDirectory>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
+
+
+    <!-- 의존하는 라이브러리를 포함하여 하나의 JAR 파일로 패키징 서 mvn assembly:assembly -->
+        <plugin>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <Main-Class>org.krakenapps.main.Kraken</Main-Class>
+                    </manifest>
+                </archive>
+                <descriptorRefs>
+                    <descriptorRef>jar-with-dependencies</descriptorRef>
+                </descriptorRefs>
+            </configuration>
+        </plugin>
         </plugins>
-    </build>
+</build>
+
+<!--  <build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <source>8</source>
+                <target>8</target>
+            </configuration>
+        </plugin>-->
+
+            <!-- 클래스패스 설정과 -jar 옵션으로 시작할 때 사용할 메인 클래스 지정 https://hmjkor.tistory.com/166
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Main-Class>pe.neon.hkchoi.DownloadScopusAuthorOccidData</Main-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>-->
+
+            <!-- # 의존관계이 있는 jar파일을 특정 폴더로 복사
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+            <!-- 의존하는 라이브러리를 포함하여 하나의 JAR 파일로 패키징 서 mvn assembly:assembly
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <Main-Class>org.krakenapps.main.Kraken</Main-Class>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>-->
+        <!--</plugins>
+
+    </build>-->
 
     <dependencies>
         <dependency>
