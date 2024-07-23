@@ -6,13 +6,19 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="pe.neon" />
-        <module name="WorkpediaAudioCheck" />
+        <module name="NlpTest" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
-      <module name="pe.neon" target="8" />
-      <module name="WorkpediaAudioCheck" target="8" />
+      <module name="NLP" target="1.8" />
+      <module name="NLPTest (1)" target="1.5" />
+      <module name="NlpTest (1)" target="1.8" />
+      <module name="NlpTest (2)" target="1.8" />
+      <module name="NlpTest (2) (coreawin)" target="1.8" />
+      <module name="pe.neon" target="1.8" />
+      <module name="pe.neon (1)" target="1.8" />
+      <module name="pe.neon (2)" target="1.8" />
+      <module name="WorkpediaAudioCheck" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

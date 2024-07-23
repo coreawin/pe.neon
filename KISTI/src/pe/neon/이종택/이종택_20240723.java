@@ -38,7 +38,7 @@ import java.util.*;
  * @date 2013. 4. 19.
  * @Version 1.0
  */
-public class 이종택_20230502 {
+public class 이종택_20240723 {
     Logger mongoLogger = LoggerFactory.getLogger(getClass());
 
     /**
@@ -317,7 +317,7 @@ public class 이종택_20230502 {
 
     public static void main(String[] args) throws Exception {
 
-        이종택_20230502 instance = new 이종택_20230502();
+        이종택_20240723 instance = new 이종택_20240723();
 //        args = new String[]{
 //                "-hoD:\\data\\이종택"
 //        };
@@ -350,8 +350,8 @@ public class 이종택_20230502 {
         System.out.println("-db, 몽고DB Name : 옵션항목 - default : KISTI_2022_PATENT");
     }
 
-    String pyear = "2022";
-    String folderDate = "20230509";
+    String pyear = "2024";
+    String folderDate = "20240723";
     String downloadPath = "d:\\data\\이종택";
     String collectionName = "US";
     String mongoIP = "172.10.200.225";
